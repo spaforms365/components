@@ -1,0 +1,16 @@
+<div data-bind="initAT: {}, template : {afterRender: postProcessingLogic }, css: {'ge-designmode': form()._formDesignMode}">
+	<div class="ms-Table">
+		<div class="ms-Table-row">
+			<span class="ms-Table-cell" style="float:left; width:80px;" data-bind="visible: _controlEnabled">
+				<input style="display:none;" type="file" data-bind="event: { change: function() {_uploadFile($element.files[0])}} " ></input>
+				<button data-bind="visible: _formButtonAddFileEnabled, click: _formButtonAddFileClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Upload</span></button>
+			</span>
+			<input style="display:none;" class="ms-TextField-field validate" type="text" data-bind="attr: { 'data-parsley-required': _formAttachmentRequired }, value: fileName " ></input>
+			<span class="ms-Table-cell ms-font-l" data-bind="visible: _formFileNameEnabled, text: fileName" style="position:relative; top:-10px;"></span>
+			<span class="ms-Table-cell ms-font-l" data-bind="visible: _formFileNameWithLinkEnabled"><b><a data-bind="attr: { href: oldFileUrl, title: oldFullFileName}" style="position:relative; top:-10px;"><span data-bind="text: fileName"></span></a></b></span>
+			<span class="ms-Table-cell" style="float:left; width:80px;" data-bind="visible: _controlEnabled">
+				<button data-bind="visible: _formButtonDeleteFileEnabled, click: _formButtonDeleteFileClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Delete</span></button>
+			</span>
+		</div>
+	</div>
+</div>

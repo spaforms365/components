@@ -1,0 +1,18 @@
+<div class="ms-Table" data-bind="initbuttons: {}, css: {'ge-designmode': form()._formDesignMode}">
+	<div class="ms-Table-row">
+		<span class="ms-Table-cell" style="float:left; width:80px;">
+			<button data-bind="visible: _formButtonSubmitEnabled, click: _formButtonSubmitClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Submit</span></button>
+			<button data-bind="visible: _formButtonCancelEnabled, click: _formButtonCancelClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Cancel</span></button>
+		</span>
+		<span class="ms-Table-cell" style="float:left; width:80px;"><button data-bind="visible: _formButtonDeleteEnabled, click: _formButtonDeleteClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Delete</span></button></span>
+		<span class="ms-Table-cell" style="float:left; width:80px;">
+			<!-- ko if:$root._formNew -->
+			<button data-bind="visible: _formButtonSaveEnabled, click: _formButtonSaveClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Save</span></button>
+			<!-- /ko -->
+			<!-- ko ifnot:$root._formNew -->
+			<button data-bind="visible: _formButtonSaveEnabled, click: _formButtonSaveClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Update</span></button>
+			<!-- /ko -->
+		</span>
+		<span class="ms-Table-cell" style="float:left; width:80px;"><button data-bind="visible: _formButtonCloseEnabled, click: _formButtonCloseClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Close</span></button></span>
+	</div>
+</div>

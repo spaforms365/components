@@ -1,0 +1,7 @@
+<div data-bind="initnotebox: {}, css: {'ge-designmode': $designmode}">
+	<div class="ms-TextField ms-TextField-multiline" >
+		<label class="ms-Label" data-bind="text: Title"></label>
+		<textarea class="ms-TextField-field validate" type="text" data-parsley-type="alphanum" data-parsley-required="true" data-bind="value: value, enable: enabled"></textarea>
+		<span class="ms-TextField-description" data-bind="text: Description"></span>
+	</div>
+</div>
