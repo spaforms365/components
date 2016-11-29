@@ -190,14 +190,14 @@ define(['text!./buttons.html'], function( htmlString) {
 		/**
 		 * DESIGN BUTTON
 		 */
-		self.actionFormsCommandDesign = function(enable) {
-			self.runtime()._formDesignMode(enable);
-			RefreshCommandUI();
-			return true;
-		};
-		self.queryFormsCommandDesign = function() {
-			return self.runtime()._formDesignMode();
-		};
+		//self.actionFormsCommandDesign = function(enable) {
+		//	self.runtime()._formDesignMode(enable);
+		//	RefreshCommandUI();
+		//	return true;
+		//};
+		//self.queryFormsCommandDesign = function() {
+		//	return self.runtime()._formDesignMode();
+		//};
 
 	}
     // Use prototype to declare any public methods
@@ -224,24 +224,10 @@ define(['text!./buttons.html'], function( htmlString) {
 			//viewModel.form = bindingContext.$parent;
 			viewModel.form( bindingContext.$root);
 			viewModel.Init();
-			
-			//if( viewModel.form()._formIsSearchContext == false) {
-			//	var displayMode = JSRequest.QueryString["DisplayMode"];
-			//	if( displayMode != "Design") {
-					if( viewModel.$form.$ribbonEdit) {
-						viewModel.$form.$ribbonEdit.Toolbar = viewModel;
-						window.setTimeout( function() { RefreshCommandUI(); }, 100);
-					}
-			//		else {
-			//			requirejs( ["ribbonedit"], 
-			//				function(ribbon) {
-			//					viewModel.ribbon = ribbon;
-			//					ribbon.Toolbar = viewModel;
-			//					window.setTimeout( function() { RefreshCommandUI(); }, 100);
-			//				});
-			//			}
-			//	}				
-			//}
+			if( viewModel.$form.$ribbonEdit) {
+				viewModel.$form.$ribbonEdit.Toolbar = viewModel;
+				window.setTimeout( function() { RefreshCommandUI(); }, 100);
+			}
 		}
 	};  
     // Return component definition
