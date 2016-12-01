@@ -13,30 +13,26 @@ define(['text!./buttons.html'], function( htmlString) {
 		this.runtime = ko.observable().extend({form: "runtime"});
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
-		if( this.designmode()) {
-			console.log("ensure columns");
-			this.runtime()._formEnsureColumns( this.schema["ListColumns"]).done( function() {
-				console.log("columns ensured");
-			});
-		}
+//
+//		this.formStatesEnum = self.runtime()._formStates;
 
-		self.form = ko.observable();//params.form);
 		// SETTINGS
-		self.hideUI = (params.hidden) ? params.hidden : false;
-		self.enableSaveUpdateDeleteButtonOnForms = (params.save !== undefined) ? params.save : false; //self.form()._formSettings
-		self.enableCancelButtonOnSubmittedOrProcessingForms = (params.cancel !== undefined) ? params.cancel : true;
-		self.enableDeleteButtonOnApprovedForms = (params.deletesubmitted != undefined) ? params.deletesubmitted : true;
+		this.visible = (params.visible) ? params.visible : true;
+		self.enableSaveUpdateDeleteButtonOnForms = (params.save) ? params.save : false; 
+		self.enableCancelButtonOnSubmittedOrProcessingForms = (params.cancel) ? params.cancel : true;
+		self.enableDeleteButtonOnApprovedForms = (params.deletesubmitted ) ? params.deletesubmitted : true;
+		self.closeFormOnButtonClick = (params.closeonclick ) ? params.closeonclick : false;
 		
 		//self._formEditingForm = ko.observable(false);
 		//self._formDesigningForm = ko.observable(false);
-		self.enableUI = ko.pureComputed(function() {
-			if( self.designmode()) return true;
-			return (self.hideUI) ? false : true;
-		});
+		this.enableui = ko.pureComputed(function() {
+			if( this.designmode()) return true;
+			return (this.visible) ? true : false;
+		}, this);
 		
         // SUBMIT
         self._formButtonSubmitClick = function () {
-            self.formState(self.form()._formStates.SUBMITTED);
+            self.formState(self.runtime()._formStates.SUBMITTED);
             self.runtime()._formModerationStatus(2); //SPModerationStatusType.Pending; -- will be applied only for Moderation Mode = DRAFT
             self.runtime()._formSave();
         };
@@ -48,16 +44,6 @@ define(['text!./buttons.html'], function( htmlString) {
 			}
 			return false;
         });
-		/**
-		 * SUBMIT FORM BUTTON
-		 */
-		self.enableFormsCommandSubmit = function() {
-			return self._formButtonSubmitEnabled();
-		};
-		self.actionFormsCommandSubmit = function() {
-			self.runtime()._closeOnButtonClick = true;
-			self._formButtonSubmitClick();
-		};
         // CANCEL
         self._formButtonCancelClick = function () {
 			if( self.runtime()) {
@@ -79,16 +65,6 @@ define(['text!./buttons.html'], function( htmlString) {
 			}
 			return false;
         });
-		/**
-		 * CANCEL FORM BUTTON
-		 */
-		self.enableFormsCommandCancel = function() {
-			return self._formButtonCancelEnabled();
-		};
-		self.actionFormsCommandCancel = function() {
-			self.runtime()._closeOnButtonClick = true;
-			self._formButtonCancelClick();
-		};
         // DELETE
         self._formButtonDeleteClick = function () {
             self.runtime()._formDelete();
@@ -117,22 +93,14 @@ define(['text!./buttons.html'], function( htmlString) {
 			}
 			return false;
         });
-		/**
-		 * DELETE FORM BUTTON
-		 */
-		self.enableFormsCommandDelete = function() {
-			return self._formButtonDeleteEnabled();
-		};
-		self.actionFormsCommandDelete = function() {
-			self._formButtonDeleteClick();
-		};
         // SAVE
+		
         self._formButtonSaveClick = function () {
             self.formState(self.runtime()._formStates.DRAFT); // Saved form is always in Draft state
             self.runtime()._formModerationStatus(3);//SPModerationStatusType.Draft; -- will be applied only for Moderation Mode = DRAFT
             self.runtime()._formSave();
         };
-        self._formButtonSaveEnabled = ko.pureComputed(function () {
+        self._formButtonSaveEnabled = ko.computed(function () {
 			if( self.runtime()) {
 				var b = ((self.formState() == self.runtime()._formStates.DRAFT) // Form can be saved only while in Draft state 
 					 && (self.readonly() == false) // read only form can't have save button
@@ -141,70 +109,114 @@ define(['text!./buttons.html'], function( htmlString) {
 			}
 			return false;
         });
-		/**
-		 * SAVE FORM BUTTON
-		 */
-		self.enableFormsCommandSave = function() {
-			return self._formButtonSaveEnabled();
-		};
-		self.actionFormsCommandSave = function() {
-			self.runtime()._closeOnButtonClick = true;
-			self._formButtonSaveClick();
-		};
-
-        // CLOSE
+        self.enableButtonSave = ko.pureComputed(function () {
+			var b = self.runtime()._formNew();
+			return (self._formButtonSaveEnabled() && b) ? true : false;
+		});
+        self.enableButtonUpdate = ko.pureComputed(function () {
+			var b = self.runtime()._formNew();
+			return (self._formButtonSaveEnabled() && !b) ? true : false;
+		});
+       // CLOSE
+		
         self._formButtonCloseClick = function () {
             self.runtime()._formRedirectToList();
         }
         self._formButtonCloseEnabled = ko.pureComputed(function () {
             return true;
         });
-		/**
-		 * CLOSE FORM BUTTON
-		 */
-		self.enableFormsCommandClose = function() {
-			return self._formButtonCloseEnabled();
-		};
-		self.actionFormsCommandClose = function() {
-			self._formButtonCloseClick();
-		};
-
 		// Proxy method:  delete list item
 		self.Init = function() {
 						
 			self.runtime()._formModerationMode((self.params.moderation != undefined) ? self.params.moderation : "Disabled");
 			self.runtime()._formUniqueIDMethod((self.params.counter != undefined) ? self.params.counter : "Counter" );//this._formSettings.UniqueIDMethod);
 		};
+//debugger;		
+		if( self.runtime().$ribbonEdit) {
+			self.runtime().$ribbonEdit.Toolbar = self;
+			window.setTimeout( function() { RefreshCommandUI(); }, 100);
+		}
+
+	}
+	/**
+	 * BUTTONS INTERFACE
+	 */
+	(function(){
+        this.buttonSaveClick = function () {
+			this.runtime()._closeOnButtonClick = this.closeFormOnButtonClick;
+			this._formButtonSaveClick();
+        };
+	}).call(buttons.prototype);
+	/**
+	 * SHAREPOINT 'FORM' RIBBON INTERFACE
+	 */
+	(function(){
+		/**
+		 * SUBMIT FORM BUTTON
+		 */
+		this.enableFormsCommandSubmit = function() {
+			return this._formButtonSubmitEnabled();
+		};
+		this.actionFormsCommandSubmit = function() {
+			this.runtime()._closeOnButtonClick = true;
+			this._formButtonSubmitClick();
+		};
+		/**
+		 * CANCEL FORM BUTTON
+		 */
+		this.enableFormsCommandCancel = function() {
+			return this._formButtonCancelEnabled();
+		};
+		this.actionFormsCommandCancel = function() {
+			this.runtime()._closeOnButtonClick = true;
+			this._formButtonCancelClick();
+		};
+		/**
+		 * DELETE FORM BUTTON
+		 */
+		this.enableFormsCommandDelete = function() {
+			return this._formButtonDeleteEnabled();
+		};
+		this.actionFormsCommandDelete = function() {
+			this._formButtonDeleteClick();
+		};
+		/**
+		 * SAVE FORM BUTTON
+		 */
+		this.enableFormsCommandSave = function() {
+			return this._formButtonSaveEnabled();
+		};
+		this.actionFormsCommandSave = function() {
+			this.runtime()._closeOnButtonClick = true;
+			this._formButtonSaveClick();
+		};
+		/**
+		 * CLOSE FORM BUTTON
+		 */
+		this.enableFormsCommandClose = function() {
+			return this._formButtonCloseEnabled();
+		};
+		this.actionFormsCommandClose = function() {
+			this._formButtonCloseClick();
+		};
 		/**
 		 * EDIT BUTTON
 		 */
-		self.actionFormsCommandEdit = function(enable) {
-			//self._formEditingForm(enable);
-			self.runtime()._formEditMode(enable);
+		this.actionFormsCommandEdit = function(enable) {
+			this.runtime()._formEditMode(enable);
 			RefreshCommandUI();
 			return true;
 		};
-		self.queryFormsCommandEdit = function() {
-			return self.runtime()._formEditMode();
+		this.queryFormsCommandEdit = function() {
+			return this.runtime()._formEditMode();
 		};
-		/**
-		 * DESIGN BUTTON
-		 */
-		//self.actionFormsCommandDesign = function(enable) {
-		//	self.runtime()._formDesignMode(enable);
-		//	RefreshCommandUI();
-		//	return true;
-		//};
-		//self.queryFormsCommandDesign = function() {
-		//	return self.runtime()._formDesignMode();
-		//};
-
-	}
+	}).call(buttons.prototype);
     // Use prototype to declare any public methods
     //componentbuttons.prototype.doSomething = function() { ... };
 	buttons.prototype.schema = {
 		"Params": {
-			"hidden": false,
+			"visible": true,
+			"closeonclick": false,
 			"save": true,
 			"cancel": true,
 			"deletesubmitted": true,
@@ -218,18 +230,6 @@ define(['text!./buttons.html'], function( htmlString) {
 		}
 	};
 
-	
-	ko.bindingHandlers.initbuttons = {
-		init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-			//viewModel.form = bindingContext.$parent;
-			viewModel.form( bindingContext.$root);
-			viewModel.Init();
-			if( viewModel.$form.$ribbonEdit) {
-				viewModel.$form.$ribbonEdit.Toolbar = viewModel;
-				window.setTimeout( function() { RefreshCommandUI(); }, 100);
-			}
-		}
-	};  
     // Return component definition
     return { viewModel: buttons, template: htmlString };
 });

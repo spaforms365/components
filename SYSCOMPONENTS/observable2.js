@@ -5,11 +5,12 @@ define(['text!observable2.html'], function( htmlString) {
 	function observable2( params) { 
 		
 		this.internalName = (params) ? params.InternalName : '';
+		this.designmode = ko.observable().extend({form: "designmode"});
 		/**
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
-		this.value = this.$column(this.internalName);
+		ko.observable().extend({ listItem: this.internalName });
 		
 	}
 	/**

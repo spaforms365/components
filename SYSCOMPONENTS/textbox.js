@@ -9,6 +9,8 @@ define(['text!textbox.html'], function( htmlString) {
 	function textbox( params) { 
 		
 		this.internalName = (params) ? params.InternalName : '';
+		this.readonly = ko.observable().extend({form: "readonly"});
+		this.designmode = ko.observable().extend({form: "designmode"});
 		
 		/**
 		 * TITLE
@@ -30,7 +32,7 @@ define(['text!textbox.html'], function( htmlString) {
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
-		this.value = this.$column(this.internalName);
+		this.value = ko.observable().extend({ listItem: this.internalName });
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enableValue = ko.pureComputed( function() { return this.$enabled(); }, this);
@@ -41,7 +43,7 @@ define(['text!textbox.html'], function( htmlString) {
 	 */
 	(function(){
 		this.$enabled = function() {
-			return (this.$readonly()) ? false : true;
+			return (this.readonly()) ? false : true;
 		};		
 	}).call(textbox.prototype);
 	/**

@@ -8,6 +8,7 @@ define(['text!radiogroup.html'], function( htmlString) {
 	function radiogroup( params) { 
 
 		this.internalName = (params) ? params.InternalName : '';
+		this.designmode = ko.observable().extend({form: "designmode"});
 		
 		this.availablechoices = (params) ? params.Choices : [];
 		
@@ -32,7 +33,7 @@ define(['text!radiogroup.html'], function( htmlString) {
 		/**
 		 * VALUE	
 		 */
-		this.value = this.$column(this.internalName);
+		this.value = ko.observable().extend({ listItem: this.internalName });
 		/**
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */

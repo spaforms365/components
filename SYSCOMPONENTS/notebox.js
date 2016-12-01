@@ -4,54 +4,45 @@
 define(['text!notebox.html'], function( htmlString) {
 	function notebox( params) { 
 		var self = this;
-		self.form = ko.observable();
-		//self.model = ko.observable();
-		self.params = params;
+		
+		this.internalName = (params) ? params.InternalName : '';
+		this.readonly = ko.observable().extend({form: "readonly"});
+		this.designmode = ko.observable().extend({form: "designmode"});
+				
+		/**
+		 * TITLE
+		 * observable bound to component's html UI template to show Sharepoint column's 'Title'
+		 * Title value passed via params of component's html notation on calling form's (viewmodel) html template
+		 * Title parameter additionally declared at component's metadata (schema), enabling dynamic param's value update on 
+		 * form's (viewmodel) html temlate from Sharepoint source on design mode.
+		 */
+		this.title = ko.observable((params) ? params.Title : '');
+		/**
+		 * DESCRIPTION	
+		 * observable bound to UI html template to show sharepoint column's 'Description' 
+		 * Description value passed via params of component's html notation on calling form's (viewmodel) html template
+		 * Description parameter additionally declared at component's metadata (schema), enabling dynamic param's value update on 
+		 * form's (viewmodel) html temlate from Sharepoint source on design mode.
+		 */
+		this.description = ko.observable((params) ? params.Description : '');
+		/**
+		 * VALUE	
+		 * observable bound to UI html template to show sharepoint column's 'Value' 
+		 */
+		this.value = ko.observable().extend({ listItem: this.internalName });
+		// -- ENABLE VALUE EDIT MODE
+		// observable bound to UI html template to enable sharepoint column's 'Value'editing
+		this.enableValue = ko.pureComputed( function() { return this.$enabled(); }, this);
 
-		//self.form._formColumns.push(self);	
-		self.InternalName = params.InternalName;
-		
-		//VALUE
-		self.value = ko.observable();
-		//LABEL
-		self.Title = ko.observable();
-		//DESCRIPTION
-		self.Description = ko.observable();
-		
-		// 
-		self.Init = function(params) {
-			try {
-				/** 
-				 * VALUE ON MODEL
-				 */
-				if( self.model[self.InternalName] == undefined) {
-					self.model[self.InternalName] = ko.observable();
-				}
-				self.value = self.model[self.InternalName];
-				self.value((self.form().__formDataResults == undefined) ? "" : self.form().__formDataResults[self.InternalName]);
-				
-				// VALUE REFERENCE ON FORM
-				self.form()._formColumnValues[self.InternalName] = self.value;
-				//FORM COLLECTION
-				self.form()._formColumns[self.InternalName] = self;
-				
-				if( params.Title != undefined) self.Title( params.Title);
-				if( params.Description != undefined) self.Description( params.Description);
-				
-			}
-			catch (e) {
-				alert( e);
-			}
-		};
-		self.enabled = ko.pureComputed( function() {
-			if( self.form()) {
-				var b2 = true;// ((self.form().mwp_FormState() == self.form()._formStates.DRAFT));
-				var b = b2 && (self.form()._formReadOnly() == false);
-				return (b.toString().toLowerCase() == 'true') ? true : false;
-			}
-			return false;
-		});
 	}
+	/**
+	 * COMPONENT MODEL HELPER METHODS
+	 */
+	(function(){
+		this.$enabled = function() {
+			return (this.readonly()) ? false : true;
+		};		
+	}).call(notebox.prototype);
     // Use prototype to declare any public methods
     //componentButtons.prototype.doSomething = function() { ... };
 	notebox.prototype.schema = {
@@ -65,14 +56,15 @@ define(['text!notebox.html'], function( htmlString) {
 		}
 	};
 	
-	
+/*	
 	ko.bindingHandlers.initnotebox = {
 		init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
 			viewModel.form(bindingContext.$root);
 			viewModel.model = bindingContext.$parent;
 			viewModel.Init(viewModel.params);
 		}
-	}; 
+	};
+*/	
  
     // Return component definition
     return { viewModel: notebox, template: htmlString };

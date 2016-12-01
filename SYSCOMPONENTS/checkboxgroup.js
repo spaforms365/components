@@ -8,6 +8,8 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 	function checkboxgroup( params) { 
 
 		this.internalName = (params) ? params.InternalName : '';
+		this.readonly = ko.observable().extend({form: "readonly"});
+		this.designmode = ko.observable().extend({form: "designmode"});
 		
 		//this.availablechoices = (params) ? JSON.parse('["' + params.Choices.split(',').join('","') + '"]') : [];
 		this.availablechoices = (params) ? params.Choices : [];
@@ -33,7 +35,7 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 		/**
 		 * VALUE	
 		 */
-		this.value = this.$column(this.internalName);
+		this.value = ko.observable().extend({ listItem: this.internalName });
 		/**
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */
