@@ -1,14 +1,22 @@
 <div class="ms-Table" data-bind="visible: enableui, css: {'ge-designmode': designmode}">
-	<div class="ms-Table-row">
-		<span class="ms-Table-cell" style="float:left; width:80px;">
-			<button data-bind="visible: _formButtonSubmitEnabled, click: _formButtonSubmitClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Submit</span></button>
-			<button data-bind="visible: _formButtonCancelEnabled, click: _formButtonCancelClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Cancel</span></button>
-		</span>
-		<span class="ms-Table-cell" style="float:left; width:80px;"><button data-bind="visible: _formButtonDeleteEnabled, click: _formButtonDeleteClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Delete</span></button></span>
-		<span class="ms-Table-cell" style="float:left; width:80px;">
-			<button data-bind="visible: enableButtonSave, click: buttonSaveClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Save</span></button>
-			<button data-bind="visible: enableButtonUpdate, click: buttonSaveClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Update</span></button>
-		</span>
-		<span class="ms-Table-cell" style="float:left; width:80px;"><button data-bind="visible: _formButtonCloseEnabled, click: _formButtonCloseClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Close</span></button></span>
+	<div style="border: solid #0072C6 3px; padding: 5px 5px 5px 5px">
+		<div class="ms-Table-row" style="background-color:#0078d7;" >
+			<span class="ms-Table-cell ms-Button-label" style="float:left; border-width:3px; border-style:solid; background-color:#0078d7; border-color:#0078d7; color:white;" data-bind="text: StepName"></span>
+		</div>
+		<div class="ms-Table-row">
+			<label class="ms-Label">Comments</label>
+			<textarea class="validate" style="width: 600px; height: 70px;" data-bind="value: commentsValue, enable: $enableTaskForm"></textarea>
+		</div>
+		<div class="ms-Table-row">
+			<span class="ms-Table-cell" style="float:left; width:80px;">
+				<button data-bind="visible: enableApproveButton, click: buttonApproveClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Approve</span></button>
+			</span>
+			<span class="ms-Table-cell" style="float:left; width:80px;">
+				<button data-bind="visible: enableRejectButton, click: buttonRejectClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Reject</span></button>
+			</span>
+			<span class="ms-Table-cell" style="float:right; width:80px;">
+				<button data-bind="visible: enableCloseButton, click: buttonCloseClick" class="ms-Button ms-Button--primary"><span class="ms-Button-label">Close</span></button>
+			</span>
+		</div>
 	</div>
 </div>
