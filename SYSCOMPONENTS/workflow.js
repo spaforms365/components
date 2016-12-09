@@ -42,22 +42,23 @@ define(['text!./workflow.html', 'text!./workflow.xaml'], function( htmlString, x
 		this.approvalWorkflowJSON = ko.observable().extend({ listItem: "mwp_ApprovalWorkflowJSON" });
 		this.approvalWorkflowText.subscribe( function(strValue) {
 			var step = undefined, arr = [];
+			
 			if( strValue ) { try { arr = JSON.parse( strValue); } catch (e) {}; }
-			arr.forEach(function(item) { if( item.ID == this.ID) step = item; });
+			arr.forEach(function(item) { if( item.ID == this.ID) step = item; }, this);
 			if(!step) step = this.$jsonNewEmptyWorkflowStep();
-//debugger;	
+	
 			var obj = this.approvalWorkflowJSON();
 			if( this.$isObject(obj)) {
 				if(!obj[this.ID]) {
 					obj[this.ID] = step;
-console.log("obj =" + JSON.stringify(obj));			
+//console.log("obj =" + JSON.stringify(obj));			
 					this.approvalWorkflowJSON(obj);
 				}
 			}
 			else {
 				obj = {};
 				obj[this.ID] = step;
-console.log("obj =" + JSON.stringify(obj));			
+//console.log("obj =" + JSON.stringify(obj));			
 				this.approvalWorkflowJSON(obj);
 			};
 			var canEdit = this.runtime().$userPermissions.has(SP.PermissionKind.editListItems);
@@ -69,10 +70,11 @@ console.log("obj =" + JSON.stringify(obj));
 		this.approvalWorkflowJSON.subscribe( function(value) {
 			var arr = [];
 			try { for( var key in value) { arr.push(value[key]);} } catch(e) {};
-console.log("arr =" + JSON.stringify(arr));			
+//console.log("arr =" + JSON.stringify(arr));			
 			this.approvalWorkflowText(JSON.stringify(arr));
 		},this);
-		
+		// triggers JSON initialization for new form
+		setTimeout( () => { if( !this.approvalWorkflowText()) this.approvalWorkflowText(null); }, 2000);
 		
 
 		/**
@@ -160,7 +162,8 @@ console.log("arr =" + JSON.stringify(arr));
 				"Current": false,
 				"Processed": false,
 				"ReviewerOutcome": "",
-				"ReviewerComments": ""
+				"ReviewerComments": "",
+				"Dependency": false
 			};
 		};
 		this.$strNewEmptyWorkflow = function() {
