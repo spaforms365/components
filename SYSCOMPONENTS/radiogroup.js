@@ -81,6 +81,8 @@ define(['text!radiogroup.html'], function( htmlString) {
 			"InternalName": "",
 			"Title": "",
 			"Description": "",
+			"Required": false,
+			"DefaultValue": "",
 			"Choices": []
 		},
 		"Connections" : {

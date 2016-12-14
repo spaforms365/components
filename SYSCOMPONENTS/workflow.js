@@ -66,7 +66,15 @@ define(['text!./workflow.html', 'text!./workflow.xaml'], function( htmlString, x
 				this.workflowStepEnabled(true);// show Task Form in runtime mode
 			};
 			
-		},this);		
+		},this);
+		/*
+		this.validateApprovalWorkflowJSON = function( workflowProcess) {
+			var result = false;
+			if( !this.$isObject(workflowProcess)) return false;
+			var workflowStep = workflowProcess[this.ID];
+			if( !this.$isObject(workflowStep)) return false;
+		};
+		*/
 		this.approvalWorkflowJSON.subscribe( function(value) {
 			var arr = [];
 			try { for( var key in value) { arr.push(value[key]);} } catch(e) {};
@@ -74,7 +82,8 @@ define(['text!./workflow.html', 'text!./workflow.xaml'], function( htmlString, x
 			this.approvalWorkflowText(JSON.stringify(arr));
 		},this);
 		// triggers JSON initialization for new form
-		setTimeout( () => { if( !this.approvalWorkflowText()) this.approvalWorkflowText(null); }, 2000);
+		//setTimeout( () => { if( !this.approvalWorkflowText()) this.approvalWorkflowText(null); }, 2000);
+		setTimeout( function() { if( !self.approvalWorkflowText()) self.approvalWorkflowText(null); }, 2000);
 		
 
 		/**
@@ -148,6 +157,20 @@ define(['text!./workflow.html', 'text!./workflow.xaml'], function( htmlString, x
 	 * PRIVATE SUPPORT METHODS
 	 */
 	(function(){
+		/*
+		this.$workflowStart() {
+			//this.approvalWorkflowJSON()[this.ID].NextID = "";
+			this.approvalWorkflowJSON.valueHasMutated();
+		};
+		this.$workflowEnd() {
+			this.approvalWorkflowJSON()[this.ID].NextID = "";
+			this.approvalWorkflowJSON.valueHasMutated();
+		};
+		this.$workflowGoTo(nextID) {
+			this.approvalWorkflowJSON()[this.ID].NextID = nextID;
+			this.approvalWorkflowJSON.valueHasMutated();
+		};
+		*/
 		this.$isObject = function(obj) {
 			return obj === Object(obj);
 		};

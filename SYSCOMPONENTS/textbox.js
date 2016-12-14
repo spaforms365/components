@@ -7,6 +7,8 @@ define(['text!textbox.html'], function( htmlString) {
 	 * COMPONENT MODEL CONSTRUCTOR
 	 */
 	function textbox( params) { 
+		// initialise validation
+		//ko.validation.init(); // <--- initialises the knockout validation object
 		
 		this.internalName = (params) ? params.InternalName : '';
 		this.readonly = ko.observable().extend({form: "readonly"});
@@ -29,10 +31,33 @@ define(['text!textbox.html'], function( htmlString) {
 		 */
 		this.description = ko.observable((params) ? params.Description : '');
 		/**
+		 * REQUIRED	
+		 */
+		this.required = ko.observable((params) ? ((params.Required) ? params.Required : false) : false);
+		/**
+		 * READONLYFIELD	
+		 */
+		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
+		/**
+		 * MAXLENGTH	
+		 */
+		this.maxlength = ko.observable((params) ? ((params.MaxLength) ? params.MaxLength : 100) : 100);
+		/**
+		 * DEFAULTVALUE	
+		 */
+		this.defaultvalue = ko.observable((params) ? ((params.DefaultValue) ? params.DefaultValue : "" ) : "");
+		/**
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
-		this.value = ko.observable().extend({ listItem: this.internalName });
+		this.value = ko.observable().extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });		
+		/**
+		 * COMPONENT VALIDATION	
+		 */
+		if( ko.validation) {
+			this.value.extend({ required: this.required() })
+					  .extend({ maxLength: this.maxlength() });
+		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enableValue = ko.pureComputed( function() { return this.$enabled(); }, this);
@@ -43,17 +68,22 @@ define(['text!textbox.html'], function( htmlString) {
 	 */
 	(function(){
 		this.$enabled = function() {
-			return (this.readonly()) ? false : true;
+			return (this.readonly() && this.readonlyfield() ) ? false : true;
 		};		
 	}).call(textbox.prototype);
 	/**
-	 * OPTIONAL COMPONENT METADATA DECLARATIONS ENABLING VISUAL DESIGN MODE SUPPORT
+	 * COMPONENT METADATA DECLARATIONS ENABLING VISUAL DESIGN MODE SUPPORT
+	 * parameter names matching SharePoint field metadata used for dynamic component params linking 
 	 */
 	textbox.prototype.schema = {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
-			"Description": ""
+			"Description": "",
+			"MaxLength": 100,
+			"DefaultValue": "",
+			"ReadOnlyField": false,
+			"Required": false
 		},
 		"Connections" : {
 			"ListItem" : ['Text']

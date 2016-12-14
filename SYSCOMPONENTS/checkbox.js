@@ -72,6 +72,7 @@ define(['text!checkbox.html'], function( htmlString) {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
+			"DefaultValue": false,
 			"Description": ""
 		},
 		"Connections" : {
