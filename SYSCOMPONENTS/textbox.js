@@ -69,7 +69,7 @@ define(['text!textbox.html'], function( htmlString) {
 	 */
 	(function(){
 		this.$enabled = function() {
-			return (this.readonly() && this.readonlyfield() ) ? false : true;
+			return (this.readonly() || this.readonlyfield() ) ? false : true;
 		};		
 	}).call(textbox.prototype);
 	/**
