@@ -29,6 +29,10 @@ define(['text!./buttons.html'], function( htmlString) {
 			if( this.designmode()) return true;
 			return (this.visible) ? true : false;
 		}, this);
+		this.validForm = ko.pureComputed( function() {
+			var d = self.runtime().$validationGroup("viewmodel");
+			return (d.isValid()) ? "" : "is-disabled";
+		});
 		
         // SUBMIT
         self._formButtonSubmitClick = function () {
@@ -40,7 +44,9 @@ define(['text!./buttons.html'], function( htmlString) {
 			if( self.runtime()) {
 				//var b = (self.formState() == self.runtime()._formStates.DRAFT);
 				var b = (self.readonly() == false);
-				return (b.toString().toLowerCase() == 'true') ? true : false;
+				var c = (b.toString().toLowerCase() == 'true') ? true : false;
+				//var d = self.runtime().$validationGroup("viewmodel");
+				return c;// && d.isValid();
 			}
 			return false;
         });
@@ -105,7 +111,10 @@ define(['text!./buttons.html'], function( htmlString) {
 				var b = ((self.formState() == self.runtime()._formStates.DRAFT) // Form can be saved only while in Draft state 
 					 && (self.readonly() == false) // read only form can't have save button
 					 && ((self.runtime()._formModerationMode() == self.runtime()._formModerationModeLevel.DRAFT) || (self.enableSaveUpdateDeleteButtonOnForms)));
-				return (b.toString().toLowerCase() == 'true') ? true : false;
+				var c = (b.toString().toLowerCase() == 'true') ? true : false;
+//debugger;				
+				//var d = self.runtime().$validationGroup("viewmodel");
+				return c;// && d.isValid();
 			}
 			return false;
         });
@@ -145,6 +154,18 @@ define(['text!./buttons.html'], function( htmlString) {
         this.buttonSaveClick = function () {
 			this.runtime()._closeOnButtonClick = this.closeFormOnButtonClick;
 			this._formButtonSaveClick();
+        };
+        this.buttonSubmitClick = function () {
+			this.runtime()._closeOnButtonClick = this.closeFormOnButtonClick;
+			this._formButtonSubmitClick();
+        };
+        this.buttonCancelClick = function () {
+			this.runtime()._closeOnButtonClick = this.closeFormOnButtonClick;
+			this._formButtonCancelClick();
+        };
+        this.buttonDeleteClick = function () {
+			this.runtime()._closeOnButtonClick = this.closeFormOnButtonClick;
+			this._formButtonDeleteClick();
         };
 	}).call(buttons.prototype);
 	/**

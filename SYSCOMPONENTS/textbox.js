@@ -56,7 +56,8 @@ define(['text!textbox.html'], function( htmlString) {
 		 */
 		if( ko.validation) {
 			this.value.extend({ required: this.required() })
-					  .extend({ maxLength: this.maxlength() });
+					  .extend({ maxLength: this.maxlength() })
+					  .extend({ validationGroup: "viewmodel" });
 		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
