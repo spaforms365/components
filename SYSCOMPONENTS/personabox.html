@@ -1,0 +1,27 @@
+<div data-bind="$init: {}, css: {'ge-designmode': designmode}">
+	<label class="ms-Label" data-bind="text: title, css: enableRequired"></label>
+    <div class="ms-PeoplePicker ms-PeoplePicker--compact">
+        <div class="ms-PeoplePicker-searchBox" data-bind="css: enableValue">
+            <div class="ms-TextField  ms-TextField--textFieldUnderlined " data-bind="visible: showValue">
+                <input class="ms-TextField-field is-formfield" type="text" data-bind="textInput: query, attr: {placeholder: description}, enterkey: {}" value="">
+            </div>
+        </div>
+        <div class="ms-PeoplePicker-results ms-PeoplePicker-results--compact " >
+			<div class="ms-PeoplePicker-resultGroup" data-bind="foreach: {data: results, as: 'persona'}">
+                <div class="ms-PeoplePicker-result " tabindex="1">
+                    <div class="ms-Persona ms-Persona--xs" data-bind="click: persona.onselect">
+                        <div class="ms-Persona-imageArea">
+                            <div class="ms-Persona-initials ms-Persona-initials--blue" data-bind="text: persona.Initials, css: persona.Color"></div>
+                        </div>
+                        <div class="ms-Persona-presence">
+                        </div>
+                        <div class="ms-Persona-details">
+                            <div class="ms-Persona-primaryText" data-bind="text: persona.PrimaryText"></div>
+                            <div class="ms-Persona-secondaryText" data-bind="text: persona.SecondaryText"></div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+        </div>
+    </div>		
+</div>

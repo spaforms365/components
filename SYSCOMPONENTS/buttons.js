@@ -11,6 +11,7 @@ define(['text!./buttons.html'], function( htmlString) {
 		this.formState = ko.observable("Draft").extend({ listItem: "mwp_FormState" });
 //debugger;
 		this.runtime = ko.observable().extend({form: "runtime"});
+		this.parent = ko.observable().extend({form: "parent"});
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
 //
@@ -30,9 +31,11 @@ define(['text!./buttons.html'], function( htmlString) {
 			return (this.visible) ? true : false;
 		}, this);
 		this.validForm = ko.pureComputed( function() {
-			var d = self.runtime().$validationGroup("viewmodel");
+//debugger;	
+			//var d = self.runtime().$validationGroup("viewmodel");			
+			var d = self.runtime().$validationGroup({name: "viewmodel", viewmodel: this.parent()});
 			return (d.isValid()) ? "" : "is-disabled";
-		});
+		}, this);
 		
         // SUBMIT
         self._formButtonSubmitClick = function () {

@@ -6,11 +6,11 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 	 * COMPONENT MODEL CONSTRUCTOR
 	 */
 	function checkboxgroup( params) { 
-
-		this.internalName = (params) ? params.InternalName : '';
+	
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
 		
+		this.internalName = (params) ? params.InternalName : '';
 		//this.availablechoices = (params) ? JSON.parse('["' + params.Choices.split(',').join('","') + '"]') : [];
 		this.availablechoices = (params) ? params.Choices : [];
 		
@@ -33,35 +33,77 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 		 */
 		this.description = ko.observable((params) ? params.Description : '');
 		/**
+		 * REQUIRED	
+		 */
+		this.required = ko.observable((params) ? ((params.Required) ? params.Required : false) : false);
+		/**
+		 * READONLYFIELD	
+		 */
+		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
+		/**
+		 * DEFAULTVALUE	
+		 */
+		this.defaultvalue = ko.observable((params) ? ((params.DefaultValue) ? params.DefaultValue : "" ) : "");
+		/**
+		 * DEFAULTMESSAGE
+		 */
+		this.defaultmessage = ko.observable((params) ? ((params.DefaultMessage) ? params.DefaultMessage : "" ) : "");
+		/**
 		 * VALUE	
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
 		/**
+		 * COMPONENT VALIDATION	
+		 */
+		if( ko.validation) {
+			this.value.extend({ required: this.required() })
+					  .extend({ validationGroup: "viewmodel" });
+		};
+		/**
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */
 		this.value.subscribe( function( val) {
-			if( !val || (val == "")) { 
-				val = {};
-				val.results = [];
-				this.value( val);
-			};
+			if( !this.required()) {
+				if( !val || (val == "")) { 
+					val = {};
+					val.results = [];
+					this.value( val);
+				}
+			}
 			var selectedchoices = (val) ? val.results : [];
 			this.choices(this.$choices(this.availablechoices, selectedchoices));
 		}, this);
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);		
 	}
 	/**
 	 * COMPONENT MODEL HELPER METHODS
 	 */
 	(function(){
+		this.$init = function(element) {
+			var elms = element.querySelectorAll(".validationBox");
+			for(var i = 0; i < elms.length; i++) {
+				this.fabricObject = {};
+				this.fabricObject['validationBox'] = elms[i];
+				if( ko.validation) {
+					// knockout.validation.min.css overrides fabric.components.css to support dropdown validation
+					var validationMessageElement = ko.validation.insertValidationMessage(this.fabricObject.validationBox);
+					//additional span for validation message
+					ko.applyBindingsToNode(validationMessageElement, { validationMessage: this.value  });
+					//enable red border on validation errors
+					ko.applyBindingsToNode(this.fabricObject.validationBox, { validationElement: this.value });
+				}
+			}						
+		};
 		this.$update = function( key, add) {
 			var val = this.value();
 			if( add) {
-				if( val == "") { val = {}; this.value( val); }
+				if( !val || val == "") { val = {}; this.value( val); }
 				if( !val.results) val.results = [];
 				val.results.push(key);
 			}
 			else {
 				val.results.splice( val.results.indexOf(key), 1);
+				if( this.required() && val.results.length == 0) val = undefined;
 			}
 			this.value(val);
 		};
@@ -98,6 +140,9 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 			"InternalName": "",
 			"Title": "",
 			"Description": "",
+			"Required": false,
+			"FieldTypeKind": 0,
+			"DefaultValue": "",
 			"Choices": []
 		},
 		"Connections" : {

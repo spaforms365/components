@@ -29,6 +29,10 @@ define(['text!checkbox.html'], function( htmlString) {
 		 */
 		this.description = ko.observable((params) ? params.Description : '');
 		/**
+		 * REQUIRED	
+		 */
+		this.required = ko.observable((params) ? ((params.Required) ? params.Required : false) : false);
+		/**
 		 * VALUE	
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
@@ -57,7 +61,6 @@ define(['text!checkbox.html'], function( htmlString) {
 			return (this.readonly()) ? 'is-disabled' : '';
 		};		
 		this.$init = function(element) {
-//debugger;			
 			var CheckBoxElements = element.querySelectorAll(".ms-CheckBox");
 			for(var i = 0; i < CheckBoxElements.length; i++) {
 				this.chkBox = new fabric['CheckBox'](CheckBoxElements[i]);
@@ -73,6 +76,8 @@ define(['text!checkbox.html'], function( htmlString) {
 			"InternalName": "",
 			"Title": "",
 			"DefaultValue": false,
+			"Required": false,
+			"FieldTypeKind": 0,
 			"Description": ""
 		},
 		"Connections" : {
@@ -80,13 +85,6 @@ define(['text!checkbox.html'], function( htmlString) {
 		}		
 	};
 	
-	
-	ko.bindingHandlers.initcheckbox = {
-		init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-			viewModel.$init( element);			
-		}
-	}; 
- 
     // Return component definition
     return { viewModel: checkbox, template: htmlString };
 });

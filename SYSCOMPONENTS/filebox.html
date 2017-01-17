@@ -1,0 +1,28 @@
+<div data-bind="$init: {}, css: {'ge-designmode': designmode}">
+	<label class="ms-Label" data-bind="text: title, css: enableRequired"></label>
+    <div class="ms-PeoplePicker ms-PeoplePicker--compact">
+	   <i class="ms-DatePicker-event ms-FilePicker-dialog ms-Icon ms-Icon--Attach"></i>
+       <div class="ms-PeoplePicker-searchBox" data-bind="css: enableValue">
+ 			<div class="ms-PeoplePicker-resultGroup" data-bind="foreach: {data: results, as: 'persona'}">
+                <span class="ms-FilePicker-result " tabindex="1">
+                    <div class="ms-Persona ms-Persona--xs ms-Persona--token ms-PeoplePicker-persona" >
+						<div>
+							<i class="ms-Icon ms-Icon--Page" style="font-size:x-large" aria-hidden="true"></i>						
+						</div>
+                        <div class="ms-Persona-details" style="padding-left:5px;">
+                            <div class="ms-Persona-primaryText ms-FilePicker--filename" data-bind="visible: persona.showText, text: persona.newFileName"></div>
+                            <div class="ms-Persona-primaryText ms-FilePicker--filelink" data-bind="visible: persona.showLink"><b><a class="ms-FilePicker--filelink2" data-bind="attr: { href: persona.url, title: persona.oldFileName}"><span data-bind="text: persona.oldFileName"></span></a></b></div>
+                            <div class="ms-Persona-secondaryText" data-bind="text: persona.secondaryText"></div>
+ 						</div>
+                        <div class="ms-Persona-actionIcon" data-bind="click: persona.onremove, visible: $parent.showValue">
+							<i class="ms-Icon ms-Icon--Cancel"></i>						
+						</div>
+                    </div>
+                </span>
+			</div>
+           <div class="ms-TextField  ms-TextField--textFieldUnderlined " data-bind="visible: showValue">
+                <input class="ms-TextField-field is-formfield" type="text" data-bind="click: addFile, attr: {placeholder: description}, enterkey: {}" value="">
+            </div>
+        </div>
+    </div>			
+</div>

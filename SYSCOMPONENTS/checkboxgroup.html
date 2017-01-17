@@ -1,13 +1,16 @@
-<div data-bind="css: {'ge-designmode': designmode}">
+<div data-bind="$init: {}, css: {'ge-designmode': designmode}">
 	<div class="ms-ChoiceFieldGroup-title">
-		<label class="ms-Label  is-required " data-bind="text: title"></label>
+		<label class="ms-Label" data-bind="text: title, css: enableRequired"></label>
 	</div>
-	<div data-bind="foreach: {data: choices, as: 'choice'}">
-		<div class="ms-CheckBox">
-		  <li role="checkbox" class="ms-Choice-field ms-Choice-type--checkbox" tabindex="0" data-bind="click: choice.onclick , css: { 'is-checked': choice.checked(), 'is-disabled': $parent.$readonly()}">
-			<span class="ms-Label" data-bind="text: choice.key"></span>
-		  </li>
-		</div>	
+	<div class="validationBox">
+		<div data-bind="foreach: {data: choices, as: 'choice'}">
+			<div class="ms-CheckBox">
+				<input tabindex="-1" type="checkbox" class="ms-CheckBox-input">
+				<label role="checkbox" class="ms-CheckBox-field is-formfield" tabindex="0" data-bind="click: choice.onclick, enterkey: {}, css: { 'is-checked': choice.checked(), 'is-disabled': $parent.$readonly()}">
+					<span class="ms-Label" data-bind="text: choice.key"></span>
+				</label>
+			</div>							
+		</div>
 	</div>
 	<div>
 		<span class="ms-TextField-description" data-bind="text: description"></span>

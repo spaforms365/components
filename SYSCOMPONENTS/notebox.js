@@ -49,6 +49,7 @@ define(['text!notebox.html'], function( htmlString) {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
+			"FieldTypeKind": 0,
 			"Description": ""
 		},
 		"Connections" : {

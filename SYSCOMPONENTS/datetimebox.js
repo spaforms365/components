@@ -1,17 +1,23 @@
 // Recommended AMD module pattern for a Knockout component that:
 //  - Can be referenced with just a single 'require' declaration
 //  - Can be included in a bundle using the r.js optimizer
-define(['text!textbox.html'], function( htmlString) {
-
+define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min.css','./../Runtime/syscomponents/jquery.datepicker', './../Runtime/syscomponents/pickadate'], function( htmlString, cssString) {
+	/**
+	 * LOAD STYLESHEET FOR THIS COMPONENT CLASS
+	 */
+	(function(css) {
+		var node = document.createElement('style');
+		document.body.appendChild(node);
+		node.innerHTML = css;
+	}(cssString));	
 	/**
 	 * COMPONENT MODEL CONSTRUCTOR
 	 */
-	function textbox( params) { 
-//debugger;		
+	function datetimebox( params) { 
+		// initialise validation
+		//ko.validation.init(); // <--- initialises the knockout validation object
+		
 		this.internalName = (params) ? params.InternalName : '';
-
-		this.runtime = ko.observable().extend({form: "runtime"});
-		this.parent = ko.observable().extend({form: "parent"});
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
 		
@@ -40,10 +46,6 @@ define(['text!textbox.html'], function( htmlString) {
 		 */
 		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
 		/**
-		 * MAXLENGTH	
-		 */
-		this.maxlength = ko.observable((params) ? ((params.MaxLength) ? params.MaxLength : 100) : 100);
-		/**
 		 * DEFAULTVALUE	
 		 */
 		this.defaultvalue = ko.observable((params) ? ((params.DefaultValue) ? params.DefaultValue : "" ) : "");
@@ -51,22 +53,21 @@ define(['text!textbox.html'], function( htmlString) {
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
-		this.value = ko.observable().extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });		
+		this.value = ko.observable().extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });
+//debugger;
+		//this.value.extend({ type: 'moment' });
 		/**
 		 * COMPONENT VALIDATION	
 		 */
 		if( ko.validation) {
 			this.value.extend({ required: this.required() })
-					  .extend({ maxLength: this.maxlength() })
-					  .extend({ validationGroup: {name: "viewmodel", viewmodel: this.parent()} });
-//					  .extend({ validationGroup: "viewmodel" });
+					  //.extend({ dateISO: true })
+					  .extend({ validationGroup: "viewmodel" });
 		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enableValue = ko.pureComputed( function() { return this.$enabled(); }, this);
-		this.enableDescription = ko.pureComputed( function() { return (this.runtime()._formReady() && !this.value.isValid() && this.value().length === 0 ) ? 'block' : 'none'; }, this);
-		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);
-		
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);		
 	};
 	/**
 	 * COMPONENT MODEL HELPER METHODS
@@ -74,95 +75,55 @@ define(['text!textbox.html'], function( htmlString) {
 	(function(){
 		this.$enabled = function() {
 			return (this.readonly() || this.readonlyfield() ) ? false : true;
-		};
-		//called by $init binding handler on html template
+		};		
 		this.$init = function(element) {
-			var elms = element.querySelectorAll(".ms-TextField");
-			for(var i = 0; i < elms.length; i++) {
-				this.fabricObject = new fabric['TextField'](elms[i]);
-			}						
+			if (typeof fabric !== "undefined") {
+				if ('DatePicker' in fabric) {
+				  var elements = element.querySelectorAll('.ms-DatePicker');
+				  var i = elements.length;
+				  var component;
+				  while(i--) {
+//debugger;					  
+					this.fabricObject = new fabric['DatePicker'](elements[i]);
+					this.fabricObject["_dropdownIcon"] = elements[i].querySelector(".ms-DatePicker-event");
+					//this.fabricObject._newDropdownLabel.innerHTML = this.value();
+					if( ko.validation) {
+						// added line 654 in knockout.validation.js : if( element.tagName == "SELECT") return init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+						// knockout.validation.min.css overrides fabric.components.css to support dropdown validation
+						//var validationMessageElement = ko.validation.insertValidationMessage(this.fabricObject._newDropdownLabel);
+						//additional span for validation message
+						//ko.applyBindingsToNode(validationMessageElement, { validationMessage: this.value  });
+						//enable red border on validation errors
+						//ko.applyBindingsToNode(this.fabricObject._newDropdownLabel, { validationElement: this.value });
+						//fix icon offset on validation error message display
+						ko.applyBindingsToNode(this.fabricObject._dropdownIcon, { validationElement: this.value });
+					}
+				  }
+				}
+			};			
 		};
-	}).call(textbox.prototype);
+	}).call(datetimebox.prototype);
 	/**
 	 * COMPONENT METADATA DECLARATIONS ENABLING VISUAL DESIGN MODE SUPPORT
 	 * parameter names matching SharePoint field metadata used for dynamic component params linking 
 	 */
-	textbox.prototype.schema = {
+	datetimebox.prototype.schema = {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
 			"Description": "",
-			"MaxLength": 100,
 			"DefaultValue": "",
-			"FieldTypeKind": 0,
 			"ReadOnlyField": false,
+			"DisplayFormat": false,
+			"FriendlyDisplayFormat": false,
+			"FieldTypeKind": 0,
 			"Required": false
 		},
 		"Connections" : {
-			"ListItem" : ['Text']
+			"ListItem" : ['DateTime']
 		}
 	};
-	textbox.prototype.schema2 = {
-		"Params": {
-			"InternalName": { defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "InternalName",
-								"Title": "InternalName",
-//								"Description": "",
-								"MaxLength": 100,
-								"DefaultValue": "",
-//								"FieldTypeKind": 0,
-//								"ReadOnlyField": false,
-								"Required": true
-							  }
-			},
-			"Title": { 		  defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "Title",
-								"Title": "Title",
-								"MaxLength": 20,
-								"DefaultValue": ""
-							  }
-			},
-			"Description": {  defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "Description",
-								"Title": "Description",
-								"MaxLength": 100,
-								"DefaultValue": ""
-							  }
-			},
-			"MaxLength": {    defaultvalue: 100,
-							  component: 'numberbox',
-							  params: {
-								"InternalName": "MaxLength",
-								"Title": "MaxLength",
-								"MaximumValue": 255,
-								"MinimumValue": 0,
-								"DefaultValue": ""
-							  }
-			},
-			"DefaultValue": "",
-			"FieldTypeKind": 0,
-			"ReadOnlyField": false,
-			"Required": {     defaultvalue: false,
-							  component: 'checkbox',
-							  params: {
-								"InternalName": "Required",
-								"Title": "Required",
-								"Required": false
-							  }
-			}
-		},
-		"Connections" : {
-			"ListItem" : ['Text']
-		}
-	};
-	 
     // Return component definition
-    return { viewModel: textbox, template: htmlString };
+    return { viewModel: datetimebox, template: htmlString };
 });
 

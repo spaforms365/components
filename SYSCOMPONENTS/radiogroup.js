@@ -7,8 +7,11 @@ define(['text!radiogroup.html'], function( htmlString) {
 	 */
 	function radiogroup( params) { 
 
-		this.internalName = (params) ? params.InternalName : '';
+		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
+
+
+		this.internalName = (params) ? params.InternalName : '';
 		
 		this.availablechoices = (params) ? params.Choices : [];
 		
@@ -31,20 +34,65 @@ define(['text!radiogroup.html'], function( htmlString) {
 		 */
 		this.description = ko.observable((params) ? params.Description : '');
 		/**
+		 * REQUIRED	
+		 */
+		this.required = ko.observable((params) ? ((params.Required) ? params.Required : false) : false);
+		/**
+		 * READONLYFIELD	
+		 */
+		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
+		/**
+		 * DEFAULTVALUE	
+		 */
+		this.defaultvalue = ko.observable((params) ? ((params.DefaultValue) ? params.DefaultValue : "" ) : "");
+		/**
+		 * DEFAULTMESSAGE
+		 */
+		this.defaultmessage = ko.observable((params) ? ((params.DefaultMessage) ? params.DefaultMessage : "" ) : "");
+		/**
 		 * VALUE	
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
+		/**
+		 * COMPONENT VALIDATION	
+		 */
+		if( ko.validation) {
+			this.value.extend({ required: this.required() })
+					  .extend({ validationGroup: "viewmodel" });
+		};
 		/**
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */
 		this.value.subscribe( function( val) {
 			this.choices(this.$choices(this.availablechoices, val));
 		}, this);
+		// -- ENABLE VALUE EDIT MODE
+		// observable bound to UI html template to enable sharepoint column's 'Value'editing
+		this.enableValue = ko.pureComputed( function() { return (this.$enabled()) ? "" : "is-disabled"; }, this);
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);		
 	}
 	/**
 	 * COMPONENT MODEL HELPER METHODS
 	 */
 	(function(){
+		this.$enabled = function() {
+			return (this.readonly() || this.readonlyfield() ) ? false : true;
+		};		
+		this.$init = function(element) {
+			var elms = element.querySelectorAll(".validationBox");
+			for(var i = 0; i < elms.length; i++) {
+				this.fabricObject = {};
+				this.fabricObject['validationBox'] = elms[i];
+				if( ko.validation) {
+					// knockout.validation.min.css overrides fabric.components.css to support dropdown validation
+					var validationMessageElement = ko.validation.insertValidationMessage(this.fabricObject.validationBox);
+					//additional span for validation message
+					ko.applyBindingsToNode(validationMessageElement, { validationMessage: this.value  });
+					//enable red border on validation errors
+					ko.applyBindingsToNode(this.fabricObject.validationBox, { validationElement: this.value });
+				}
+			}						
+		};
 		this.$select = function( selectedchoice) {
 			this.choices().forEach( function( choice, index) {
 				choice.checked( (choice.key == selectedchoice) ? true : false);
@@ -82,6 +130,7 @@ define(['text!radiogroup.html'], function( htmlString) {
 			"Title": "",
 			"Description": "",
 			"Required": false,
+			"FieldTypeKind": 0,
 			"DefaultValue": "",
 			"Choices": []
 		},

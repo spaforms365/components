@@ -1,17 +1,18 @@
 // Recommended AMD module pattern for a Knockout component that:
 //  - Can be referenced with just a single 'require' declaration
 //  - Can be included in a bundle using the r.js optimizer
-define(['text!textbox.html'], function( htmlString) {
+define(['text!numberbox.html'], function( htmlString) {
 
 	/**
 	 * COMPONENT MODEL CONSTRUCTOR
 	 */
-	function textbox( params) { 
-//debugger;		
+	function numberbox( params) { 
+		// initialise validation
+		//ko.validation.init(); // <--- initialises the knockout validation object
+		
 		this.internalName = (params) ? params.InternalName : '';
-
+		
 		this.runtime = ko.observable().extend({form: "runtime"});
-		this.parent = ko.observable().extend({form: "parent"});
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
 		
@@ -40,9 +41,13 @@ define(['text!textbox.html'], function( htmlString) {
 		 */
 		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
 		/**
-		 * MAXLENGTH	
+		 * MAX	
 		 */
-		this.maxlength = ko.observable((params) ? ((params.MaxLength) ? params.MaxLength : 100) : 100);
+		this.max = ko.observable((params) ? ((params.MaximumValue) ? params.MaximumValue : false) : false);
+		/**
+		 * MIN	
+		 */
+		this.min = ko.observable((params) ? ((params.MinimumValue) ? params.MinimumValue : false) : false);
 		/**
 		 * DEFAULTVALUE	
 		 */
@@ -57,9 +62,10 @@ define(['text!textbox.html'], function( htmlString) {
 		 */
 		if( ko.validation) {
 			this.value.extend({ required: this.required() })
-					  .extend({ maxLength: this.maxlength() })
-					  .extend({ validationGroup: {name: "viewmodel", viewmodel: this.parent()} });
-//					  .extend({ validationGroup: "viewmodel" });
+					  .extend({ number: true })
+					  .extend({ validationGroup: "viewmodel" });
+			if( this.max()) this.value.extend({ max: this.max() });
+			if( this.min()) this.value.extend({ min: this.min() });
 		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
@@ -74,95 +80,30 @@ define(['text!textbox.html'], function( htmlString) {
 	(function(){
 		this.$enabled = function() {
 			return (this.readonly() || this.readonlyfield() ) ? false : true;
-		};
-		//called by $init binding handler on html template
-		this.$init = function(element) {
-			var elms = element.querySelectorAll(".ms-TextField");
-			for(var i = 0; i < elms.length; i++) {
-				this.fabricObject = new fabric['TextField'](elms[i]);
-			}						
-		};
-	}).call(textbox.prototype);
+		};		
+	}).call(numberbox.prototype);
 	/**
 	 * COMPONENT METADATA DECLARATIONS ENABLING VISUAL DESIGN MODE SUPPORT
 	 * parameter names matching SharePoint field metadata used for dynamic component params linking 
 	 */
-	textbox.prototype.schema = {
+	numberbox.prototype.schema = {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
 			"Description": "",
-			"MaxLength": 100,
-			"DefaultValue": "",
-			"FieldTypeKind": 0,
+			"MaximumValue": false,
+			"MinimumValue": false,
+			"DefaultValue": false,
 			"ReadOnlyField": false,
+			"FieldTypeKind": 0,
 			"Required": false
 		},
 		"Connections" : {
-			"ListItem" : ['Text']
-		}
-	};
-	textbox.prototype.schema2 = {
-		"Params": {
-			"InternalName": { defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "InternalName",
-								"Title": "InternalName",
-//								"Description": "",
-								"MaxLength": 100,
-								"DefaultValue": "",
-//								"FieldTypeKind": 0,
-//								"ReadOnlyField": false,
-								"Required": true
-							  }
-			},
-			"Title": { 		  defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "Title",
-								"Title": "Title",
-								"MaxLength": 20,
-								"DefaultValue": ""
-							  }
-			},
-			"Description": {  defaultvalue: '',
-							  component: 'textbox',
-							  params: {
-								"InternalName": "Description",
-								"Title": "Description",
-								"MaxLength": 100,
-								"DefaultValue": ""
-							  }
-			},
-			"MaxLength": {    defaultvalue: 100,
-							  component: 'numberbox',
-							  params: {
-								"InternalName": "MaxLength",
-								"Title": "MaxLength",
-								"MaximumValue": 255,
-								"MinimumValue": 0,
-								"DefaultValue": ""
-							  }
-			},
-			"DefaultValue": "",
-			"FieldTypeKind": 0,
-			"ReadOnlyField": false,
-			"Required": {     defaultvalue: false,
-							  component: 'checkbox',
-							  params: {
-								"InternalName": "Required",
-								"Title": "Required",
-								"Required": false
-							  }
-			}
-		},
-		"Connections" : {
-			"ListItem" : ['Text']
+			"ListItem" : ['Number']
 		}
 	};
 	 
     // Return component definition
-    return { viewModel: textbox, template: htmlString };
+    return { viewModel: numberbox, template: htmlString };
 });
 
