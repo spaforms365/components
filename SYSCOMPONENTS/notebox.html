@@ -1,7 +1,7 @@
-<div data-bind="css: {'ge-designmode': designmode}">
+<div data-bind="$init:{}, css: {'ge-designmode': designmode}">
+	<label class="ms-Label" data-bind="text: title, css: enableRequired"></label>
 	<div class="ms-TextField ms-TextField-multiline" >
-		<label class="ms-Label" data-bind="text: title"></label>
-		<textarea class="ms-TextField-field validate" type="text" data-parsley-type="alphanum" data-parsley-required="true" data-bind="value: value, enable: enableValue"></textarea>
-		<span class="ms-TextField-description" data-bind="text: description"></span>
+		<label class="ms-Label" style="display: none;" data-bind="text: description, style: {display: enableDescription()}"></label>
+		<textarea class="ms-TextField-field is-formfield" type="text" data-bind="textInput: value, enable: enableValue, enterkey: {}" ></textarea>
 	</div>
 </div>

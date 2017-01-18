@@ -6,6 +6,9 @@ define(['text!notebox.html'], function( htmlString) {
 		var self = this;
 		
 		this.internalName = (params) ? params.InternalName : '';
+
+		this.runtime = ko.observable().extend({form: "runtime"});
+		this.parent = ko.observable().extend({form: "parent"});
 		this.readonly = ko.observable().extend({form: "readonly"});
 		this.designmode = ko.observable().extend({form: "designmode"});
 				
@@ -26,13 +29,40 @@ define(['text!notebox.html'], function( htmlString) {
 		 */
 		this.description = ko.observable((params) ? params.Description : '');
 		/**
+		 * REQUIRED	
+		 */
+		this.required = ko.observable((params) ? ((params.Required) ? params.Required : false) : false);
+		/**
+		 * READONLYFIELD	
+		 */
+		this.readonlyfield = ko.observable((params) ? ((params.ReadOnlyField) ? params.ReadOnlyField : false ): false);
+		/**
+		 * MAXLENGTH	
+		 */
+		this.maxlength = ko.observable((params) ? ((params.MaxLength) ? params.MaxLength : 10000) : 10000);
+		/**
+		 * DEFAULTVALUE	
+		 */
+		this.defaultvalue = ko.observable((params) ? ((params.DefaultValue) ? params.DefaultValue : "" ) : "");
+		/**
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
+		/**
+		 * COMPONENT VALIDATION	
+		 */
+		if( ko.validation) {
+			this.value.extend({ required: this.required() })
+					  .extend({ maxLength: this.maxlength() })
+					  .extend({ validationGroup: {name: "viewmodel", viewmodel: this.parent()} });
+//					  .extend({ validationGroup: "viewmodel" });
+		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enableValue = ko.pureComputed( function() { return this.$enabled(); }, this);
+		this.enableDescription = ko.pureComputed( function() { return (this.runtime()._formReady() && !this.value.isValid() && this.value().length === 0 ) ? 'block' : 'none'; }, this);
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);
 
 	}
 	/**
@@ -40,8 +70,15 @@ define(['text!notebox.html'], function( htmlString) {
 	 */
 	(function(){
 		this.$enabled = function() {
-			return (this.readonly()) ? false : true;
-		};		
+			return (this.readonly() || this.readonlyfield() ) ? false : true;
+		};
+		//called by $init binding handler on html template
+		this.$init = function(element) {
+			var elms = element.querySelectorAll(".ms-TextField");
+			for(var i = 0; i < elms.length; i++) {
+				this.fabricObject = new fabric['TextField'](elms[i]);
+			}						
+		};
 	}).call(notebox.prototype);
     // Use prototype to declare any public methods
     //componentButtons.prototype.doSomething = function() { ... };
@@ -49,8 +86,12 @@ define(['text!notebox.html'], function( htmlString) {
 		"Params": {
 			"InternalName": "",
 			"Title": "",
+			"Description": "",
+			"MaxLength": 10000,
+			"DefaultValue": "",
 			"FieldTypeKind": 0,
-			"Description": ""
+			"ReadOnlyField": false,
+			"Required": false
 		},
 		"Connections" : {
 			"ListItem" : ['Note']

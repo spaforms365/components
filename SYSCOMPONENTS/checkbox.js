@@ -41,6 +41,8 @@ define(['text!checkbox.html'], function( htmlString) {
 		this.enabled = ko.pureComputed( function() {
 			return this.$enabled();
 		}, this);		
+		this.enableValue = ko.pureComputed( function() { return (this.$enabled()) ? "" : "is-disabled"; }, this);
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);
 		/**
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */

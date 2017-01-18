@@ -111,27 +111,7 @@ define(['text!./filebox.html'], function( htmlString) {
 				this._peoplePickerSearch = this._container.querySelector(".ms-TextField-field");
 				this._peoplePickerSearchBox = this._container.querySelector(".ms-PeoplePicker-searchBox");
 				this._selectedPeople = this._container.querySelector(".ms-PeoplePicker-selectedPeople");
-				/*
-				this._assignClicks();
-				if (this._selectedPeople) {
-					this._assignRemoveHandler();
-					this._selectedCount = this._container.querySelector(".ms-PeoplePicker-selectedCount");
-					this._selectedPlural = this._container.querySelector(".ms-PeoplePicker-selectedCountPlural");
-				}
-				if (this._peoplePickerMenu) {
-					this._peoplePickerMenu.setAttribute("style", "display: none;");
-				}
-				*/
 			}
-			/*
-			FilePicker.prototype._createModalHost = function (e) {
-				e.stopPropagation();
-				this._peoplePickerMenu.setAttribute("style", "display: block;");
-				this._contextualHostView = new fabric.ContextualHost(this._peoplePickerMenu, MODAL_POSITION, this._peoplePickerSearchBox, false, [""], true, this._contextHostCallBack.bind(this));
-				this._peoplePickerSearchBox.classList.add("is-active");
-				this._isContextualMenuOpen = true;
-			};
-			*/
 			FilePicker.prototype._clickHandler = function (e) {
 				//this._peoplePickerResults = this._peoplePickerMenu.querySelectorAll(".ms-PeoplePicker-result");
 				//if( this._peoplePickerResults.length > 0) this._createModalHost(e);
@@ -153,149 +133,6 @@ define(['text!./filebox.html'], function( htmlString) {
 				}
 				*/
 			};
-			/*
-			FilePicker.prototype._selectResult = function (e) {
-				//e.stopPropagation();
-				//var currentResult = this._findElement(e.target, "ms-Persona");
-//debugger;				
-				this._peoplePickerResults = this._peoplePickerMenu.querySelector(".ms-PeoplePicker-result");
-				var currentResult = this._peoplePickerResults.querySelector(".ms-Persona");
-				var clonedResult = currentResult.cloneNode(true);
-				// if facePile - add to members list / else tokenize
-				if (this._container.classList.contains("ms-PeoplePicker--facePile")) {
-					this._addResultToMembers(clonedResult);
-				}
-				else {
-					this._tokenizeResult(clonedResult);
-				}
-				this._updateCount();
-				
-				var id = currentResult.querySelector(".ms-Persona-primaryText");
-				if( this._selectCallback) this._selectCallback(id.innerText, clonedResult);
-				// Close the open contextual host
-				//this._contextualHostView.disposeModal();
-			};
-			FilePicker.prototype._findElement = function (childObj, className) {
-				var currentElement = childObj.parentNode;
-				while (!currentElement.classList.contains(className)) {
-					currentElement = currentElement.parentNode;
-				}
-				return currentElement;
-			};
-			FilePicker.prototype._addRemoveBtn = function (persona, token) {
-				var actionBtn;
-				var actionIcon = document.createElement("i");
-				if (token) {
-					actionBtn = document.createElement("div");
-					actionBtn.classList.add("ms-Persona-actionIcon");
-					actionBtn.addEventListener("click", this._removeToken.bind(this), true);
-				}
-				else {
-					actionBtn = document.createElement("button");
-					actionBtn.classList.add("ms-PeoplePicker-resultAction");
-					actionBtn.addEventListener("click", this._removeResult.bind(this), true);
-				}
-				actionIcon.classList.add("ms-Icon", "ms-Icon--Cancel");
-				actionBtn.appendChild(actionIcon);
-				persona.appendChild(actionBtn);
-			};
-			FilePicker.prototype._removeToken = function (e) {
-				var currentToken = this._findElement(e.target, "ms-Persona");
-				var id = currentToken.querySelector(".ms-Persona-primaryText");
-				//console.log('delete id: ' + id.innerText);
-				if( this._removeCallback) this._removeCallback(id.innerText);
-				currentToken.remove();
-				
-//				var currentToken = this._findElement(e.target, "ms-Persona");
-//				currentToken.remove();
-				
-			};
-			FilePicker.prototype._removeResult = function (e) {
-				var currentResult = this._findElement(e.target, "ms-PeoplePicker-selectedPerson");
-				currentResult.remove();
-				this._updateCount();
-			};
-			FilePicker.prototype._removeItem = function (e) {
-				var currentItem = this._findElement(e.target, "ms-PeoplePicker-result");
-				currentItem.remove();
-			};
-			FilePicker.prototype._updateCount = function () {
-				if (this._selectedPeople) {
-					var count = this._selectedPeople.querySelectorAll(".ms-PeoplePicker-selectedPerson").length;
-					this._selectedCount.textContent = count.toString();
-					this._selectedPlural.style.display = (count === 1) ? "none" : "inline";
-				}
-			};
-			FilePicker.prototype._tokenizeResult = function (tokenResult) {
-				var searchBox = this._container.querySelector(".ms-PeoplePicker-searchBox");
-				var textField = searchBox.querySelector(".ms-TextField");
-				// Add token classes to persona
-				tokenResult.classList.add(TOKEN_CLASS, "ms-PeoplePicker-persona");
-				// Add the remove button to the token
-				this._addRemoveBtn(tokenResult, true);
-				// Use persona xs variant for token
-				if (tokenResult.classList.contains("ms-Persona--sm")) {
-					tokenResult.classList.remove("ms-Persona--sm");
-					tokenResult.classList.add("ms-Persona--xs");
-				}
-				// Prepend the token before the search field
-				searchBox.insertBefore(tokenResult, textField);
-			};
-			FilePicker.prototype._addResultToMembers = function (persona) {
-				var membersList = this._container.querySelector(".ms-PeoplePicker-selectedPeople");
-				var firstMember = membersList.querySelector(".ms-PeoplePicker-selectedPerson");
-				var selectedItem = document.createElement("li");
-				// Create the selectedPerson list item
-				selectedItem.classList.add("ms-PeoplePicker-selectedPerson");
-				selectedItem.tabIndex = 1;
-				// Append the result persona to list item
-				selectedItem.appendChild(persona);
-				// Add the remove button to the persona
-				this._addRemoveBtn(selectedItem, false);
-				// Add removeResult event to resultAction
-				selectedItem.querySelector(".ms-PeoplePicker-resultAction").addEventListener("click", this._removeResult.bind(this), true);
-				membersList.insertBefore(selectedItem, firstMember);
-			};
-			FilePicker.prototype._assignClicks = function () {
-				
-				var _this = this;
-				this._peoplePickerSearch.addEventListener("click", this._clickHandler.bind(this), true);
-				this._peoplePickerSearch.addEventListener("keyup", function (e) {
-					if (e.keyCode !== 27 && !_this._isContextualMenuOpen) {
-						_this._clickHandler(e);
-					}
-				}, true);
-				
-			};
-			FilePicker.prototype._assignRemoveHandler = function () {
-				var selectedPeople = this._selectedPeople.querySelectorAll(".ms-PeoplePicker-selectedPerson");
-				for (var i = 0; i < selectedPeople.length; i++) {
-					selectedPeople[i].querySelector(".ms-PeoplePicker-resultAction").addEventListener("click", this._removeResult.bind(this), true);
-				}
-			};
-			FilePicker.prototype._contextHostCallBack = function () {
-				this._peoplePickerSearchBox.classList.remove("is-active");
-				this._isContextualMenuOpen = false;
-			};
-			FilePicker.prototype._loadField = function() {
-				// Get all results
-				this._peoplePickerResults = this._peoplePickerMenu.querySelectorAll(".ms-PeoplePicker-result");
-				for (var i = 0; i < this._peoplePickerResults.length; i++) {
-					var personaResult = this._peoplePickerResults[i].querySelector(".ms-Persona");
-					var currentResult = personaResult;
-					var clonedResult = currentResult.cloneNode(true);
-					// if facePile - add to members list / else tokenize
-					if (this._container.classList.contains("ms-PeoplePicker--facePile")) {
-						this._addResultToMembers(clonedResult);
-					}
-					else {
-						this._tokenizeResult(clonedResult);
-					}
-					this._updateCount();
-					if( this._appendCallback) this._appendCallback(clonedResult);
-				}
-			};
-			*/
 			return FilePicker;
 		}());
 		fabric.FilePicker = FilePicker;
@@ -376,7 +213,7 @@ define(['text!./filebox.html'], function( htmlString) {
 			"Required": false
 		},
 		"ListColumns" : {
-			"mwp_Attachments": '<Field Type="Note" DisplayName="Form Attachments Map" EnforceUniqueValues="FALSE" Required="FALSE" ID="{17117ed8-0696-4031-b721-2ef99de31109}" Name="mwp_Attachments" StaticName="mwp_Attachments" Sortable="FALSE" RichText="FALSE" RichTextMode="Compatible" IsolateStyles="FALSE" AppendOnly="FALSE" UnlimitedLengthInDocumentLibrary="FALSE" NumLines="6" SourceID="{daf8e407-d019-4c86-ba35-822c1763ac52}" Version="1" />'
+			"mwp_Attachments": '<Field Type="Note" DisplayName="Attachments Map" Group="_Hidden" EnforceUniqueValues="FALSE" Required="FALSE" ID="{17117ed8-0696-4031-b721-2ef99de31109}" Name="mwp_Attachments" StaticName="mwp_Attachments" Sortable="FALSE" RichText="FALSE" RichTextMode="Compatible" IsolateStyles="FALSE" AppendOnly="FALSE" UnlimitedLengthInDocumentLibrary="FALSE" NumLines="6" SourceID="{daf8e407-d019-4c86-ba35-822c1763ac52}" Version="1" />'
 		},
 		"Connections" : {
 			"ListItem" : ['Attachments']
