@@ -1,7 +1,8 @@
 // Recommended AMD module pattern for a Knockout component that:
 //  - Can be referenced with just a single 'require' declaration
 //  - Can be included in a bundle using the r.js optimizer
-define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min.css','./../Runtime/syscomponents/jquery.datepicker', './../Runtime/syscomponents/pickadate'], function( htmlString, cssString) {
+//define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min.css','./../Runtime/syscomponents/jquery.datepicker', './../Runtime/syscomponents/pickadate'], function( htmlString, cssString) {
+define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min.css', './../Runtime/syscomponents/pickadate'], function( htmlString, cssString) {
 	/**
 	 * LOAD STYLESHEET FOR THIS COMPONENT CLASS
 	 */
@@ -54,6 +55,13 @@ define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });
+		this.value.subscribe(function(val){
+			// convert ISO string received from SharePoint field
+			if( val.indexOf('-') > 0) {
+				var now = new Date(val);
+				this.fabricObject.picker.set('select', [now.getFullYear(), now.getMonth(), now.getDate()]);
+			}			
+		}, this);
 //debugger;
 		//this.value.extend({ type: 'moment' });
 		/**

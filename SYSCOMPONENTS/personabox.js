@@ -48,14 +48,27 @@ define(['text!personabox.html'], function( htmlString) {
 		 */
 		this.color = ko.observable((params && params.Color) ? params.Color : "ms-Persona-initials--green");
 		/**
+		 * MULTIPLY VALUES	
+		 */
+		this.allowmultiplevalues = ko.observable((params && params.AllowMultipleValues) ? params.AllowMultipleValues : false);
+		/**
 		 * VALUE	
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
 		this.value = ko.observable({results:[]}).extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });
 		this.appendvalue = false;
 		this.value.subscribe( function( val) {
+//debugger;			
 			if( !val) val = {};
-			if( val && !val.results) val.results = [];
+			if( val.__metadata && val.__metadata.type == "SP.Data.UserInfoItem") {
+				val.results = (val.Id == -1) ? [] : [{"Title":val.Title, "Id":val.Id}]
+				delete val.__metadata;
+				delete val.Title;
+				delete val.Id;
+			}
+			else {
+				if( val && !val.results) val.results = [];
+			}
 			if( !this.appendvalue) {
 				this.results(this.$fieldresults(val.results));
 				setTimeout( function() { self.fabricObject._loadField(); self.results(self.$results([])); }, 50); 
@@ -78,23 +91,97 @@ define(['text!personabox.html'], function( htmlString) {
 		 * PEOPLE SEARCH BOX	
 		 */
 		this.query = ko.observable("");
+		this.onfocus = ko.observable(false);
+		this.querycache = ko.observable("");
+		
+		this.onfocus.subscribe( function( val) {
+			
+console.log("subscribe onfocus: "+val);
+			var self = this;
+
+//			if( val) this.query( this.querycache()); else setTimeout( function() { self.query(""); }, 500);
+//if( val) this.query( this.querycache());			
+if( !val) { setTimeout(function() {
+				if(self.fabricObject._contextualHostView) { 
+				//debugger;
+				if(self.fabricObject._contextualHostView._container.parentNode) self.fabricObject._contextualHostView.disposeModal();
+				//delete this.fabricObject._contextualHostView;
+				self.fabricObject._contextualHostView = undefined;
+				/*
+					if(self.fabricObject._selectedResult) {
+						self.fabricObject._selectedResult = false;
+						self.query("");
+					*/
+				}
+//self.query("");				
+}, 500);
+}
+			
+		}, this);
+		
 		this.options = {
 			"minQueryLength" : 1,
 			"maxResultsetLength" : 5
 		};
 		this.query.subscribe( function( squery) {
+//console.log("subscribe squery: "+squery);
+			if(this.onfocus()) { 
+				this.querycache(squery);
+//				console.log("querycache: "+squery);
+			}
 			var self = this;
 			if( squery.length <= this.options.minQueryLength) {
 				this.results(this.$results([]));
 				$(".ms-ContextualHost-main").hide();
+				//if(this.fabricObject_contextualHostView) this.fabricObject_contextualHostView.disposeModal();
+				//this.fabricObject_contextualHostView = null;
 			}
-			else this.runtime()._formPeopleQuery( squery).done( function(resultset) {
-					if( resultset.length == 0) $(".ms-ContextualHost-main").hide();
+			else { 
+//console.log("request squery: "+squery);
+				this.runtime()._formPeopleQuery( squery).done( function(resultset) {
+//console.log("respond length: "+resultset.length);					
+					if( resultset.length == 0) {
+						$(".ms-ContextualHost-main").hide();
+						//if(this.fabricObject_contextualHostView) this.fabricObject_contextualHostView.disposeModal();
+						//this.fabricObject_contextualHostView = null;
+					}
 					else 	 				   $(".ms-ContextualHost-main").show();
-					self.results(self.$results(resultset));
+					var newset = self.$results(resultset);
+//console.log("newset length: "+newset.length);					
+					self.results(newset);
 				 });
+			};
+			//setTimeout( function() { self.modalHost();}, 200);
 		}, this);
 		this.results = ko.observableArray([]);//this.results3);
+		/*
+		this.modalHost = function() {
+//debugger;			
+			this.fabricObject._peoplePickerResults = this.fabricObject._peoplePickerMenu.querySelectorAll(".ms-PeoplePicker-result");
+console.log("results to show: " + this.fabricObject._peoplePickerResults.length + "modal host: " + this.fabricObject._contextualHostView);
+			var b = this.fabricObject._peoplePickerResults.length;
+			if( b > 0) {
+				var e = { stopPropagation: function() {} };
+				if(!this.fabricObject._contextualHostView) {
+debugger;					
+console.log("create model host: " + this.fabricObject._contextualHostView);				
+					this.fabricObject._createModalHost(e);
+				}
+			}
+			else {
+				
+console.log("dispose model host: " + this.fabricObject._contextualHostView);				
+				if(this.fabricObject._contextualHostView) { 
+				debugger;
+				this.fabricObject._contextualHostView.disposeModal();
+				delete this.fabricObject._contextualHostView;
+				this.fabricObject._contextualHostView = undefined;
+				}
+				
+			}
+		}
+		*/
+		
 	};
 	/**
 	 * FABRIC UI PEOPLE PICKER COMPONENT OVERRIDES AND EXTENSIONS
@@ -117,8 +204,11 @@ define(['text!personabox.html'], function( htmlString) {
 		}
 	};
 	fabric.PeoplePicker.prototype._clickHandler = function (e) {
+//return;		
+console.log("fabric.PeoplePicker.prototype._clickHandler");
 		this._peoplePickerResults = this._peoplePickerMenu.querySelectorAll(".ms-PeoplePicker-result");
-		if( this._peoplePickerResults.length > 0) this._createModalHost(e);
+console.log("results to show: " + this._peoplePickerResults.length + "modal host: " + this._contextualHostView);
+		if( this._peoplePickerResults.length > 0 /*&& !this._contextualHostView*/) this._createModalHost(e);
 	};
     fabric.PeoplePicker.prototype._removeToken = function (e) {
 		var currentToken = this._findElement(e.target, "ms-Persona");
@@ -126,6 +216,16 @@ define(['text!personabox.html'], function( htmlString) {
 		//console.log('delete id: ' + id.innerText);
 		if( this._removeCallback) this._removeCallback(id.innerText);
 		currentToken.remove();
+	};
+    fabric.PeoplePicker.prototype._removeFirstToken = function () {
+		var searchBox = this._container.querySelector(".ms-PeoplePicker-searchBox");
+		var currentToken = searchBox.querySelector(".ms-Persona");
+		if( currentToken) {
+			var id = currentToken.querySelector(".ms-Persona-primaryText");
+			//console.log('delete id: ' + id.innerText);
+			//if( this._removeCallback) this._removeCallback(id.innerText);
+			currentToken.remove();
+		}
 	};
 	fabric.PeoplePicker.prototype._addRemoveBtn = function (persona, token) {
 		
@@ -145,6 +245,35 @@ define(['text!personabox.html'], function( htmlString) {
 		actionBtn.appendChild(actionIcon);
 		persona.appendChild(actionBtn);
 		this._isReadOnly(actionBtn);
+	};	
+    fabric.PeoplePicker.prototype._selectResult = function (e) {
+            e.stopPropagation();
+//debugger;
+            var currentResult = this._findElement(e.target, "ms-Persona");
+            var clonedResult = currentResult.cloneNode(true);
+            // if facePile - add to members list / else tokenize
+            if (this._container.classList.contains("ms-PeoplePicker--facePile")) {
+                this._addResultToMembers(clonedResult);
+            }
+            else {
+                this._tokenizeResult(clonedResult);
+            }
+            this._updateCount();
+            // Close the open contextual host
+if(this._contextualHostView)			
+            this._contextualHostView.disposeModal();
+this._contextualHostView = undefined;
+this._selectedResult = true;
+//delete this._contextualHostView;
+    };
+    fabric.PeoplePicker.prototype._contextHostCallBack = function () {
+//debugger;		
+console.log("fabric.PeoplePicker.prototype._contextHostCallBack");
+		this._peoplePickerSearchBox.classList.remove("is-active");
+		this._isContextualMenuOpen = false;
+		
+//		var queryBox = this._container.querySelector(".ms-TextField-field");		
+//		if(!(queryBox === document.activeElement)) queryBox.value="";
 	};
 	
 	/**
@@ -185,6 +314,7 @@ define(['text!personabox.html'], function( htmlString) {
 			}
 		};
 		this.$initials = function( fullname) {
+//debugger;			
 			var a = fullname.split(",");
 			var fc = (a[1]) ? a[1].trim().charAt(0) : "?";
 			var sc = (a[0]) ? a[0].trim().charAt(0): "?";				
@@ -207,12 +337,14 @@ define(['text!personabox.html'], function( htmlString) {
 										var key = this.jsonObject.Key;
 										this.parent.runtime()._formPeopleQuery( {userName: key}).done( function(user) {
 											var o = self.value();
+											if( !self.allowmultiplevalues()) o.results = [];
 											o.results.push({
 												__metadata: { Id: "", "type":"SP.Data.UserInfoItem"},
 												Title: user.Title,
 												Id: user.Id,
 												Key: key
 											});
+											if( !self.allowmultiplevalues()) self.fabricObject._removeFirstToken();
 											self.fabricObject._selectResult(event); 
 											self.appendvalue = true;
 											self.value(o);
@@ -263,7 +395,7 @@ define(['text!personabox.html'], function( htmlString) {
 			"Required": false
 		},
 		"Connections" : {
-			"ListItem" : ['UserMulti']
+			"ListItem" : ['UserMulti','User']
 		}
 	};
     // Return component definition

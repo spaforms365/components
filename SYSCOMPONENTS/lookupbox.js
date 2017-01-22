@@ -58,7 +58,12 @@ define(['text!lookupbox.html'], function( htmlString) {
 		 * observable bound to UI html template to show sharepoint column's 'Value' 
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
-		//this.value.subscribe( function(val){ if(val) console.log(JSON.stringify(val));});
+		this.value.subscribe( function(val){ 
+			//if(val) 
+			//console.log("lookupbox val: "+JSON.stringify(val));
+			var self = this;
+			if( val && val.__deferred) setTimeout( function() { self.value(undefined); }, 100);
+		}, this);
 		/**
 		 * COMPONENT VALIDATION	
 		 */
