@@ -63,6 +63,7 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 		 * FABRIC UI CHECKBOX CONTROL BINDING	
 		 */
 		this.value.subscribe( function( val) {
+//debugger;			
 			if( !this.required()) {
 				if( !val || (val == "")) { 
 					val = {};

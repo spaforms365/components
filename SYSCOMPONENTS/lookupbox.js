@@ -59,8 +59,6 @@ define(['text!lookupbox.html'], function( htmlString) {
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
 		this.value.subscribe( function(val){ 
-			//if(val) 
-			//console.log("lookupbox val: "+JSON.stringify(val));
 			var self = this;
 			if( val && val.__deferred) setTimeout( function() { self.value(undefined); }, 100);
 		}, this);
@@ -149,7 +147,7 @@ define(['text!lookupbox.html'], function( htmlString) {
 						//fix icon offset on validation error message display
 						ko.applyBindingsToNode(self.fabricObject._dropdownIcon, { validationElement: self.value });
 					}
-				}, 100);
+				}, 200);
 			});
 
 		};

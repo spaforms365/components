@@ -97,17 +97,18 @@ define(['text!dropdown.html'], function( htmlString) {
 		this.$init = function(element) {
 			var self = this;
 			
-			var elms = element.querySelectorAll(".ms-Dropdown");
-			for(var i = 0; i < elms.length; i++) {
-				this.fabricObject = new fabric['Dropdown'](elms[i]);
+			setTimeout( function() {
+				var elm = element.querySelector(".ms-Dropdown");
+				self.fabricObject = new fabric['Dropdown'](elm);
+				self.fabricObject["_dropdownIcon"] = self.fabricObject._container.querySelector(".ms-Dropdown-caretDown");
+				// enterkey handler (enter to tab) keypress support
+				//this.fabricObject._newDropdownLabel.classList.add("formfield");
+				// selected value on dropdown
+				self.fabricObject._newDropdownLabel.innerHTML = (self.value()) ? self.value() : "";
+				self.fabricObject._container.setAttribute("fulltitle", (self.value()) ? self.value() : self.description());
+				self.fabricObject._checkTruncation();
 				
-				this.fabricObject["_dropdownIcon"] = this.fabricObject._container.querySelector(".ms-Dropdown-caretDown");
-				
-				this.fabricObject._newDropdownLabel.innerHTML = (self.value()) ? self.value() : "";
-				this.fabricObject._container.setAttribute("fulltitle", (this.value()) ? this.value() : this.description());
-				this.fabricObject._checkTruncation();
-				
-				this.fabricObject._originalDropdown.addEventListener('change', function(e) {
+				self.fabricObject._originalDropdown.addEventListener('change', function(e) {
 					var index = 0;
 					for (var i = 0; i < self.fabricObject._dropdownItems.length; ++i) {
 						if( self.fabricObject._dropdownItems[i].oldOption.selected) index = i; 
@@ -116,23 +117,18 @@ define(['text!dropdown.html'], function( htmlString) {
 					self.fabricObject._container.setAttribute("fulltitle", (self.value()) ? self.value() : self.description());
 					self.fabricObject._checkTruncation();
 				}, false);
-				
-				// enterkey handler (enter to tab) keypress support
-				//this.fabricObject._newDropdownLabel.classList.add("formfield");
-				// selected value on dropdown
-				this.fabricObject._newDropdownLabel.innerHTML = this.value();
 				if( ko.validation) {
 					// added line 654 in knockout.validation.js : if( element.tagName == "SELECT") return init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 					// knockout.validation.min.css overrides fabric.components.css to support dropdown validation
-					var validationMessageElement = ko.validation.insertValidationMessage(this.fabricObject._newDropdownLabel);
+					var validationMessageElement = ko.validation.insertValidationMessage(self.fabricObject._newDropdownLabel);
 					//additional span for validation message
-					ko.applyBindingsToNode(validationMessageElement, { validationMessage: this.value  });
+					ko.applyBindingsToNode(validationMessageElement, { validationMessage: self.value  });
 					//enable red border on validation errors
-					ko.applyBindingsToNode(this.fabricObject._newDropdownLabel, { validationElement: this.value });
+					ko.applyBindingsToNode(self.fabricObject._newDropdownLabel, { validationElement: self.value });
 					//fix icon offset on validation error message display
-					ko.applyBindingsToNode(this.fabricObject._dropdownIcon, { validationElement: this.value });
+					ko.applyBindingsToNode(self.fabricObject._dropdownIcon, { validationElement: self.value });
 				}
-			}						
+			}, 300); // 100 insufficient			
 		};
 	}).call(dropdown.prototype);
 	/**

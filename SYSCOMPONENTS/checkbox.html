@@ -1,9 +1,15 @@
 <div data-bind="$init: {}, css: {'ge-designmode': designmode}">
-	<div class="ms-CheckBox">
-		<input tabindex="-1" type="checkbox" class="ms-CheckBox-input">
-		<label role="checkbox" class="ms-CheckBox-field is-formfield" tabindex="0" data-bind="click: onclick, enterkey: {}, css: enabled">
-			<span class="ms-Label" data-bind="text: title, css: enableRequired"></span>
-		</label>
-		<div><span class="ms-TextField-description" data-bind="text: description"></span></div>
-	</div>							
+	<div class="ms-ChoiceFieldGroup-title">
+		<label class="ms-Label" data-bind="text: title, css: enableRequired"></label>
+	</div>
+	<div class="validationBox">
+		<div class="ms-CheckBox">
+			<input tabindex="-1" type="checkbox" class="ms-CheckBox-input">
+			<label role="checkbox" class="ms-CheckBox-field is-formfield" tabindex="0" data-bind="click: onclick, enterkey: {}, css: { 'is-checked': value(), 'is-disabled': $readonly()}">
+			</label>
+		</div>							
+	</div>
+	<div>
+		<span class="ms-TextField-description" data-bind="text: description"></span>
+	</div>
 </div>

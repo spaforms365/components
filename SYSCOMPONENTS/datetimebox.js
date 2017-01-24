@@ -57,7 +57,7 @@ define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min
 		this.value = ko.observable().extend({ listItem: this.internalName });//.extend({ required: true }).extend({ minLength: 3 });
 		this.value.subscribe(function(val){
 			// convert ISO string received from SharePoint field
-			if( val.indexOf('-') > 0) {
+			if( val && val.indexOf('-') > 0) {
 				var now = new Date(val);
 				this.fabricObject.picker.set('select', [now.getFullYear(), now.getMonth(), now.getDate()]);
 			}			

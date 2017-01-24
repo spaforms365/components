@@ -36,23 +36,25 @@ define(['text!checkbox.html'], function( htmlString) {
 		 * VALUE	
 		 */
 		this.value = ko.observable().extend({ listItem: this.internalName });
+		/**
+		 * COMPONENT VALIDATION	
+		 */
+		if( ko.validation) {
+			this.value.extend({ required: this.required() })
+					  .extend({ validationGroup: "viewmodel" });
+		};
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enabled = ko.pureComputed( function() {
 			return this.$enabled();
 		}, this);		
 		this.enableValue = ko.pureComputed( function() { return (this.$enabled()) ? "" : "is-disabled"; }, this);
-		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);
-		/**
-		 * FABRIC UI CHECKBOX CONTROL BINDING	
-		 */
-		this.value.subscribe( function( val) {
-			//console.log("subscribe chkBox value = " + val);
-			if( this.chkBox) { 	if( val) this.chkBox.check(); else this.chkBox.unCheck(); }
-		}, this);
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);		
 		this.onclick = function(data, event) {
-			if( !event.currentTarget.classList.contains('is-disabled')) 
-				self.value((event.currentTarget.classList.contains('is-checked')) ? true : false);
+			if( !event.currentTarget.classList.contains('is-disabled')) {
+				var checked = (event.currentTarget.classList.contains('is-checked')) ? false: true;
+				self.value(checked);
+			}
 		};
 	}
 	/**
@@ -61,12 +63,20 @@ define(['text!checkbox.html'], function( htmlString) {
 	(function(){
 		this.$enabled = function() {
 			return (this.readonly()) ? 'is-disabled' : '';
-		};		
+		};	
 		this.$init = function(element) {
-			var CheckBoxElements = element.querySelectorAll(".ms-CheckBox");
-			for(var i = 0; i < CheckBoxElements.length; i++) {
-				this.chkBox = new fabric['CheckBox'](CheckBoxElements[i]);
-				if( this.value()) this.chkBox.check(); else this.chkBox.unCheck();
+			var elms = element.querySelectorAll(".validationBox");
+			for(var i = 0; i < elms.length; i++) {
+				this.fabricObject = {};
+				this.fabricObject['validationBox'] = elms[i];
+				if( ko.validation) {
+					// knockout.validation.min.css overrides fabric.components.css to support dropdown validation
+					var validationMessageElement = ko.validation.insertValidationMessage(this.fabricObject.validationBox);
+					//additional span for validation message
+					ko.applyBindingsToNode(validationMessageElement, { validationMessage: this.value  });
+					//enable red border on validation errors
+					ko.applyBindingsToNode(this.fabricObject.validationBox, { validationElement: this.value });
+				}
 			}						
 		};
 	}).call(checkbox.prototype);

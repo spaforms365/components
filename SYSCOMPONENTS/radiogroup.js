@@ -52,7 +52,7 @@ define(['text!radiogroup.html'], function( htmlString) {
 		/**
 		 * VALUE	
 		 */
-		this.value = ko.observable().extend({ listItem: this.internalName });
+		this.value = ko.observable(this.defaultvalue()).extend({ listItem: this.internalName });
 		/**
 		 * COMPONENT VALIDATION	
 		 */
@@ -69,7 +69,9 @@ define(['text!radiogroup.html'], function( htmlString) {
 		// -- ENABLE VALUE EDIT MODE
 		// observable bound to UI html template to enable sharepoint column's 'Value'editing
 		this.enableValue = ko.pureComputed( function() { return (this.$enabled()) ? "" : "is-disabled"; }, this);
-		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);		
+		this.enableRequired = ko.pureComputed( function() { return (this.required()) ? "is-required" : ""; }, this);	
+		// set default value
+		if(this.defaultvalue()) this.choices(this.$choices(this.availablechoices, this.value()));
 	}
 	/**
 	 * COMPONENT MODEL HELPER METHODS
