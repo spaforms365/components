@@ -146,7 +146,7 @@ define(['text!./buttons.html'], function( htmlString) {
 //debugger;		
 		if( self.runtime().$ribbonEdit) {
 			self.runtime().$ribbonEdit.Toolbar = self;
-			window.setTimeout( function() { RefreshCommandUI(); }, 100);
+			window.setTimeout( function() { RefreshCommandUI();   }, 100);
 		}
 
 	}
@@ -228,7 +228,7 @@ define(['text!./buttons.html'], function( htmlString) {
 		 */
 		this.actionFormsCommandEdit = function(enable) {
 			this.runtime()._formEditMode(enable);
-			RefreshCommandUI();
+			RefreshCommandUI();  
 			return true;
 		};
 		this.queryFormsCommandEdit = function() {
