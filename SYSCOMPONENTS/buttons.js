@@ -240,13 +240,14 @@ define(['text!./buttons.html'], function( htmlString) {
 	buttons.prototype.schema = {
 		"Params": {
 			"visible": true,
-			"closeonclick": false,
+			"closeonclick": true,
 			"save": true,
 			"cancel": true,
 			"deletesubmitted": true,
 			"moderation": "Draft",
 			"uniqueid": "Counter"
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-buttons/",
 		"ListColumns" : {
 			"mwp_FormID": '<Field ID="{3c53b379-6256-4ab5-bc14-8fa61360e526}" Type="Text" Name="mwp_FormID" Required="FALSE" DisplayName="Form ID" Description="Unique Form Identificator" Group="Medline Web Portal" SourceID="{cbfbae2b-8362-4201-ac65-6a64a7d1d411}" StaticName="mwp_FormID" AllowDeletion="TRUE" Version="1" Customization="" ColName="nvarchar4" RowOrdinal="0"><Default>0</Default></Field>',
 			"mwp_FormType": '<Field ID="{ac53b379-6156-4aa5-bc14-8fa6136be526}" Type="Text" Name="mwp_FormType" Required="FALSE" DisplayName="Form Type" Description="Give SPA Form Name" Group="Medline Web Portal" SourceID="{cbfbae2b-8362-4201-ac65-6a64a7d1d411}" StaticName="mwp_FormType" AllowDeletion="TRUE" Version="1" Customization="" ColName="nvarchar3" RowOrdinal="0"><Default>Generic SPA Form</Default></Field>',

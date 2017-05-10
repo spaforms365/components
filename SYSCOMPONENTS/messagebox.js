@@ -48,7 +48,8 @@ define(['text!messagebox.html'], function( htmlString) {
 	messagebox.prototype.schema = {
 		"Params": {
 			"message": "COMPLETED SUCCESSFULLY. MY FORMS VIEW WILL REFLECT CHANGES WITH 5 MIN DELAY"
-		}
+		},
+		"Permalink": "https://spaforms365.com/docs/syslib-messagebox/"
 	};
 
 	

@@ -20,6 +20,7 @@ define(['text!observable2.html'], function( htmlString) {
 		"Params": {
 			"InternalName": ""
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-observable2/",
 		"Connections" : {
 			"ListItem" : ['Any','Text','Choice','Note','Boolean','DateTime','Computed']
 		}

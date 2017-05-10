@@ -98,6 +98,7 @@ define(['text!currencybox.html'], function( htmlString) {
 			"FieldTypeKind": 0,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-currencybox/",
 		"Connections" : {
 			"ListItem" : ['Currency']
 		}

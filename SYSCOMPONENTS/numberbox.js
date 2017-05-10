@@ -98,6 +98,7 @@ define(['text!numberbox.html'], function( htmlString) {
 			"FieldTypeKind": 0,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-numberbox/",
 		"Connections" : {
 			"ListItem" : ['Number']
 		}

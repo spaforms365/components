@@ -93,21 +93,12 @@ define(['text!notebox.html'], function( htmlString) {
 			"ReadOnlyField": false,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-notebox/",
 		"Connections" : {
 			"ListItem" : ['Note']
 		}
 	};
-	
-/*	
-	ko.bindingHandlers.initnotebox = {
-		init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-			viewModel.form(bindingContext.$root);
-			viewModel.model = bindingContext.$parent;
-			viewModel.Init(viewModel.params);
-		}
-	};
-*/	
- 
+	 
     // Return component definition
     return { viewModel: notebox, template: htmlString };
 });

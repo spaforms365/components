@@ -212,6 +212,7 @@ define(['text!./filebox.html'], function( htmlString) {
 			"FieldTypeKind": 0,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-filebox/",
 		"ListColumns" : {
 			"mwp_Attachments": '<Field Type="Note" DisplayName="Attachments Map" Group="_Hidden" EnforceUniqueValues="FALSE" Required="FALSE" ID="{17117ed8-0696-4031-b721-2ef99de31109}" Name="mwp_Attachments" StaticName="mwp_Attachments" Sortable="FALSE" RichText="FALSE" RichTextMode="Compatible" IsolateStyles="FALSE" AppendOnly="FALSE" UnlimitedLengthInDocumentLibrary="FALSE" NumLines="6" SourceID="{daf8e407-d019-4c86-ba35-822c1763ac52}" Version="1" />'
 		},

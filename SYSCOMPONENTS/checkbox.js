@@ -92,6 +92,7 @@ define(['text!checkbox.html'], function( htmlString) {
 			"FieldTypeKind": 0,
 			"Description": ""
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-checkbox/",
 		"Connections" : {
 			"ListItem" : ['Boolean']
 		}		

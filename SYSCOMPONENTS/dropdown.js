@@ -144,6 +144,7 @@ define(['text!dropdown.html'], function( htmlString) {
 			"Required": false,
 			"Choices": []
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-dropdown/",
 		"Connections" : {
 			"ListItem" : ['Choice']
 		}		

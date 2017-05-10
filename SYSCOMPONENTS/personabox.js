@@ -394,6 +394,7 @@ console.log("fabric.PeoplePicker.prototype._contextHostCallBack");
 			"Color": "ms-Persona-initials--green", //"ms-Persona-initials--blue" "ms-Persona-initials--purple" "ms-Persona-initials--black"
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-personabox/",
 		"Connections" : {
 			"ListItem" : ['UserMulti','User']
 		}

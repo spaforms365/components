@@ -172,6 +172,7 @@ define(['text!lookupbox.html'], function( htmlString) {
 			"FieldTypeKind": 0,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-lookupbox/",
 		"Connections" : {
 			"ListItem" : ['Lookup']
 		}

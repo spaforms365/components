@@ -127,6 +127,7 @@ define(['text!datetimebox.html', 'text!./../Runtime/syscomponents/datepicker.min
 			"FieldTypeKind": 0,
 			"Required": false
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-datetimebox/",
 		"Connections" : {
 			"ListItem" : ['DateTime']
 		}

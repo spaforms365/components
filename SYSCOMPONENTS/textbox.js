@@ -100,7 +100,8 @@ define(['text!textbox.html'], function( htmlString) {
 		},
 		"Connections" : {
 			"ListItem" : ['Text']
-		}
+		},
+		"Permalink": "https://spaforms365.com/docs/syslib-textbox/"
 	};
 	textbox.prototype.schema2 = {
 		"Params": {

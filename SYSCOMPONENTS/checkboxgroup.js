@@ -146,6 +146,7 @@ define(['text!checkboxgroup.html'], function( htmlString) {
 			"DefaultValue": "",
 			"Choices": []
 		},
+		"Permalink": "https://spaforms365.com/docs/syslib-checkboxgroup/",
 		"Connections" : {
 			"ListItem" : ['MultiChoice']
 		}		
