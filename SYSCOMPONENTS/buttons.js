@@ -4,7 +4,8 @@
 define(['text!./buttons.html'], function( htmlString) {
 	function buttons( params) { 
 		var self = this;
-		self.params = params;
+
+		this.params = params;
 //debugger;	
 		this.formID = ko.observable("").extend({ listItem: "mwp_FormID" });
 		this.formType = ko.observable("").extend({ listItem: "mwp_FormType" });
@@ -18,11 +19,19 @@ define(['text!./buttons.html'], function( htmlString) {
 //		this.formStatesEnum = self.runtime()._formStates;
 
 		// SETTINGS
-		this.visible = (params.visible) ? params.visible : true;
-		self.enableSaveUpdateDeleteButtonOnForms = (params.save) ? params.save : false; 
-		self.enableCancelButtonOnSubmittedOrProcessingForms = (params.cancel) ? params.cancel : true;
-		self.enableDeleteButtonOnApprovedForms = (params.deletesubmitted ) ? params.deletesubmitted : true;
-		self.closeFormOnButtonClick = (params.closeonclick ) ? params.closeonclick : false;
+		this.visible = (params.hasOwnProperty('visible')) ? Boolean(params.visible) : true;
+		self.enableSaveUpdateDeleteButtonOnForms = (params.hasOwnProperty('save')) ? Boolean(params.save) : false; 
+		this.enableSubmit = (params.hasOwnProperty('submit')) ? Boolean(params.submit) : true;
+		this.enableCancel = (params.hasOwnProperty('cancel')) ? Boolean(params.cancel) : true;
+		if(!this.enableSubmit) this.enableCancel = false;
+		
+		var f = top.SPAFORM.form;
+//console.log('params.submit =' + params.submit + ' bool = '+ Boolean(params.submit));		
+		if( this.enableSubmit && f.submitControl) f.submitControl();
+		if( this.enableCancel && f.cancelControl) f.cancelControl();
+
+		self.enableDeleteButtonOnApprovedForms = (params.hasOwnProperty('deletesubmitted') ) ? Boolean(params.deletesubmitted) : true;
+		self.closeFormOnButtonClick = (params.hasOwnProperty('closeonclick') ) ? Boolean(params.closeonclick) : false;
 		
 		//self._formEditingForm = ko.observable(false);
 		//self._formDesigningForm = ko.observable(false);
@@ -30,11 +39,22 @@ define(['text!./buttons.html'], function( htmlString) {
 			if( this.designmode()) return true;
 			return (this.visible) ? true : false;
 		}, this);
+
 		this.validForm = ko.pureComputed( function() {
-//debugger;	
-			//var d = self.runtime().$validationGroup("viewmodel");			
-			var d = self.runtime().$validationGroup({name: "viewmodel", viewmodel: this.parent()});
-			return (d.isValid()) ? "" : "is-disabled";
+//debugger;
+try{	
+			//var d = self.runtime().$validationGroup("viewmodel");	
+console.log(' this.runtime() = '+this.runtime());	
+console.log(' this.parent() = '+this.parent());				
+			var d = this.runtime().$validationGroup({name: "viewmodel", viewmodel: this.parent()});
+			f.isValid = d.isValid();
+console.log(' f.isValid = '+f.isValid);
+			RefreshCommandUI();
+			return (f.isValid) ? "" : "is-disabled";
+}
+catch(e) {
+	console.log('buttons.js error - '+e);
+}
 		}, this);
 		
         // SUBMIT
@@ -49,10 +69,15 @@ define(['text!./buttons.html'], function( htmlString) {
 				var b = (self.readonly() == false);
 				var c = (b.toString().toLowerCase() == 'true') ? true : false;
 				//var d = self.runtime().$validationGroup("viewmodel");
-				return c;// && d.isValid();
+				f.submitReady = c && this.enableSubmit;
+//console.log('c =' + c + ' this.enableSubmit = '+this.enableSubmit);					
 			}
-			return false;
-        });
+			else 
+				f.submitReady = false;
+//console.log('self._formButtonSubmitEnabled =' + f.submitReady);				
+			RefreshCommandUI();
+			return f.submitReady;// && d.isValid();
+        }, this);
         // CANCEL
         self._formButtonCancelClick = function () {
 			if( self.runtime()) {
@@ -69,11 +94,15 @@ define(['text!./buttons.html'], function( htmlString) {
 				var b = (((self.formState() != self.runtime()._formStates.DRAFT) && (self.formState() != self.runtime()._formStates.CANCELLED)) // cancel enabled always, except Draft or Cancelled
 						//&& (self.readonly() == false) // read only form can't have cancel button
 						&& (self.runtime()._formCanEdit() == true) && (self.runtime()._formEditMode() == true)
-						&& self.enableCancelButtonOnSubmittedOrProcessingForms); // cancel enabled via options
-				return (b.toString().toLowerCase() == 'true') ? true : false;
+						&& this.enableCancel); // cancel enabled via options
+				f.cancelReady = (b.toString().toLowerCase() == 'true') ? true : false;
 			}
-			return false;
-        });
+			else
+				f.cancelReady = false;
+
+			RefreshCommandUI();				
+			return f.cancelReady;
+        }, this);
         // DELETE
         self._formButtonDeleteClick = function () {
             self.runtime()._formDelete();
@@ -98,10 +127,15 @@ define(['text!./buttons.html'], function( htmlString) {
 				    //&& (self.readonly() == false) // read only form can't have delete button
 					&& (self.runtime()._formCanEdit() == true) && (self.runtime()._formEditMode() == true)
 					&& moderation && ( b_draft || b_submitted));
-				return (b.toString().toLowerCase() == 'true') ? true : false;
+
+				f.deleteReady = (b.toString().toLowerCase() == 'true') ? true : false;
 			}
-			return false;
-        });
+			else 
+				f.deleteReady = false;
+
+			RefreshCommandUI();
+			return f.deleteReady;
+        }, this);
         // SAVE
 		
         self._formButtonSaveClick = function () {
@@ -110,25 +144,30 @@ define(['text!./buttons.html'], function( htmlString) {
             self.runtime()._formSave();
         };
         self._formButtonSaveEnabled = ko.computed(function () {
+			var saveReady;
 			if( self.runtime()) {
 				var b = ((self.formState() == self.runtime()._formStates.DRAFT) // Form can be saved only while in Draft state 
 					 && (self.readonly() == false) // read only form can't have save button
 					 && ((self.runtime()._formModerationMode() == self.runtime()._formModerationModeLevel.DRAFT) || (self.enableSaveUpdateDeleteButtonOnForms)));
-				var c = (b.toString().toLowerCase() == 'true') ? true : false;
-//debugger;				
-				//var d = self.runtime().$validationGroup("viewmodel");
-				return c;// && d.isValid();
+				saveReady = (b.toString().toLowerCase() == 'true') ? true : false;
 			}
-			return false;
-        });
+			else
+				saveReady = false;
+
+			return saveReady;
+        }, this);
         self.enableButtonSave = ko.pureComputed(function () {
 			var b = self.runtime()._formNew();
-			return (self._formButtonSaveEnabled() && b) ? true : false;
-		});
+			f.saveReady = (self._formButtonSaveEnabled() && b) ? true : false;
+			RefreshCommandUI();
+			return f.saveReady;
+		}, this);
         self.enableButtonUpdate = ko.pureComputed(function () {
 			var b = self.runtime()._formNew();
-			return (self._formButtonSaveEnabled() && !b) ? true : false;
-		});
+			f.updateReady = (self._formButtonSaveEnabled() && !b) ? true : false;
+			RefreshCommandUI();
+			return f.updateReady;
+		}, this);
        // CLOSE
 		
         self._formButtonCloseClick = function () {
@@ -242,6 +281,7 @@ define(['text!./buttons.html'], function( htmlString) {
 			"visible": true,
 			"closeonclick": true,
 			"save": true,
+			"submit": false,
 			"cancel": true,
 			"deletesubmitted": true,
 			"moderation": "Draft",

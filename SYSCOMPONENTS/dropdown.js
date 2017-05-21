@@ -71,7 +71,7 @@ define(['text!dropdown.html'], function( htmlString) {
 	 */
 	 
 	fabric.Dropdown.prototype._checkTruncation = function () {
-		var origText = this._newDropdownLabel.getAttribute("fulltitle");
+		var origText = this._container.getAttribute("fulltitle");
 		this._dropdownLabelHelper.textContent = origText;
 		if (this._dropdownLabelHelper.offsetHeight > this._newDropdownLabel.offsetHeight) {
 			var i = 0;
